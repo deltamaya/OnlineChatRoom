@@ -35,7 +35,6 @@ public:
                 tasks_.pop();
                 lk.unlock();
                 cv_.notify_one();
-                cout<<"";
                 // printf("***************thread %lld: task begin******************\n",this_thread::get_id());
                 task();
                 // printf("***************thread %lld: task end******************\n",this_thread::get_id());

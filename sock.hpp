@@ -68,6 +68,16 @@ public:
             perror("bind");
         }
     }
+    void conn(const string&address,const uint16_t port){
+        sockaddr_in addr;
+        addr.sin_addr.s_addr=inet_addr(address.c_str());
+        addr.sin_port=htons(port);
+        addr.sin_family=AF_INET;
+        auto ret=connect(fd_,(sockaddr*)(&addr),sizeof(addr));
+        if(ret!=0){
+            log_error("connect error");
+        }
+    }
     string_view ip()
     {
         return inet_ntoa(addr_.sin_addr);

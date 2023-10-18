@@ -1,12 +1,19 @@
+#pragma once
 #include "utils.h"
 #include <json/json.h>
 using namespace std;
 
-#define SEP "\r\n\r\n"
-
-enum class ServiceCode:int32_t
+#define SEP "##"
+constexpr size_t bufsize = 1024;
+enum class ServiceCode:uint8_t
 {
-    post,
+    postmsg,
+    signup,
+    login,
+};
+enum class StatusCode:uint8_t{
+    ok,
+    error
 };
 
 class Request
@@ -16,7 +23,11 @@ public:
     using enum ServiceCode;
     string user_;
     string msg_;
-    ServiceCode code_;
+    ServiceCode servcode_;
+    StatusCode stuscode_;
+    Request():user_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok){
+
+    }
     static bool parse_request(string&str,Request* r){
         auto pos=str.find(SEP);
         if(pos!=string::npos){
@@ -31,9 +42,12 @@ public:
         Json::Value ret;
         Json::FastWriter writer;
         ret["user"] = user_;
-        ret["code"] = static_cast<int>(code_);
+        ret["stuscode"] = static_cast<int>(stuscode_);
+        ret["servcode"] = static_cast<int>(servcode_);
         ret["msg"] = msg_;
-        return writer.write(ret)+SEP;
+        auto retstr=writer.write(ret);
+        retstr.pop_back();
+        return retstr+SEP;
     }
     void deserialize(const string& str){
         Json::Reader reader;
@@ -41,16 +55,22 @@ public:
         reader.parse(str,v);
         user_=v["user"].asString();
         msg_=v["msg"].asString();
-        code_=static_cast<ServiceCode>(v["code"].asInt());
+        servcode_=static_cast<ServiceCode>(v["servcode"].asInt());
+        stuscode_=static_cast<StatusCode>(v["stuscode"].asInt());
     }
 };
 
 class Response
 {
+    public:
     using enum ServiceCode;
     string user_;
     string msg_;
-    ServiceCode code_;
+    ServiceCode servcode_;
+    StatusCode stuscode_;
+    Response():user_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok){
+
+    }
     static bool parse_response(string&str,Response* r){
         auto pos=str.find(SEP);
         if(pos!=string::npos){
@@ -65,9 +85,12 @@ class Response
         Json::Value ret;
         Json::FastWriter writer;
         ret["user"] = user_;
-        ret["code"] = static_cast<int>(code_);
+        ret["stuscode"] = static_cast<int>(stuscode_);
+        ret["servcode"] = static_cast<int>(servcode_);
         ret["msg"] = msg_;
-        return writer.write(ret)+SEP;
+        auto retstr=writer.write(ret);
+        retstr.pop_back();
+        return retstr+SEP;
     }
     void deserialize(const string& str){
         Json::Reader reader;
@@ -75,6 +98,7 @@ class Response
         reader.parse(str,v);
         user_=v["user"].asString();
         msg_=v["msg"].asString();
-        code_=static_cast<ServiceCode>(v["code"].asInt());
+        servcode_=static_cast<ServiceCode>(v["servcode"].asInt());
+        stuscode_=static_cast<StatusCode>(v["stuscode"].asInt());
     }
 };

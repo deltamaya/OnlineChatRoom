@@ -1,5 +1,5 @@
 #pragma once
-
+#include "db_conn_pool.hpp"
 #include "epoller.hpp"
 #include "sock.hpp"
 #include <unordered_map>
@@ -8,13 +8,15 @@
 #include <functional>
 #include "protocol.hpp"
 #include "minilog.hh"
+#include "service.h"
 constexpr uint16_t default_port = 55369;
 using namespace std;
-constexpr size_t bufsize = 1024;
-void service(unique_ptr<Connection> &, const Request);
+
+
 class EpollServer
 {
-    // ThreadPool<7> workers;
+    DBConnPool<7> dbconns;
+    ThreadPool<7> workers;
     // aka connections, key: a connection's fd
     unordered_map<int, unique_ptr<Connection>> conns_;
     Epoller epoller_; // epoll
@@ -33,7 +35,7 @@ public:
         auto lsnsock = make_unique<Sock>(socket(AF_INET, SOCK_STREAM, 0), default_port);
         lsnsock->bd();
         lsnsock->lsn();
-        auto lsn = make_unique<Connection>(std::move(lsnsock));
+        auto lsn = make_unique<Connection>(std::move(lsnsock),this);
         lsn->register_callback(std::bind(&EpollServer::accepter, this, std::placeholders::_1), nullptr, nullptr);
         add_conn(std::move(lsn), EPOLLIN | EPOLLET);
 
@@ -57,8 +59,12 @@ public:
     }
     void shutdown()
     {
+        for (auto &[k, v] : conns_)
+        {
+            epoller_.del(k);
+            v.reset();
+        }
         cout << "server shutdown\n";
-        exit(0);
     }
     // dispatch events to thread pool or accept incoming connections
     void dispatcher(int event_cnt)
@@ -92,7 +98,7 @@ public:
     {
         do
         {
-            auto clientconn = make_unique<Connection>(conn->client_->acc());
+            auto clientconn = make_unique<Connection>(conn->client_->acc(),this);
             clientconn->register_callback(std::bind(&EpollServer::receiver, this, std::placeholders::_1),
                                           std::bind(&EpollServer::sender, this, std::placeholders::_1),
                                           std::bind(&EpollServer::excepter, this, std::placeholders::_1));
@@ -107,41 +113,65 @@ public:
         char buf[bufsize];
         do
         {
-            bzero(buf,sizeof(buf));
+            bzero(buf, sizeof(buf));
             auto n = recv(conn->client_->fd(), buf, sizeof(buf) - 1, 0);
             if (n > 0)
             {
                 // buf[n-1]=0;buf[n-2]=0;
                 conn->inbuf_ += buf;
-                log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_,conn->inbuf_.size());
+                log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, conn->inbuf_.size());
 
                 Request request;
                 bool ok = Request::parse_request(conn->inbuf_, &request);
-
+                Response ret;
+                mysqlpp::Connection*dbconn=nullptr;
+                log_debug("parsing");
                 if (ok)
                 {
+                    log_debug("parse ok");
+                    log_debug("parsed request: {}",request.serialize());
                     epoller_.rwcfg(conn, true, true);
-                    service(conn,request);
-                }
-                if(!ok)log_debug("parse not ok");
-            }
-            else if (n == 0)
-            {
+                    // TODO
+                    switch (request.servcode_)
+                    {
+                    case ServiceCode::postmsg:
 
-                if (errno == EAGAIN || errno == EWOULDBLOCK)
-                {
-                    break;
-                }
-                else if (errno == EINTR)
-                {
-                    continue;
+                        break;
+                    case ServiceCode::login:
+                            dbconn=conn->svr->get();
+                            log_debug("login triggered\n");
+                            ret=handle_login(dbconn,request);
+                            conn->svr->ret(dbconn);
+                            log_debug("login response: {}",ret.serialize());
+                            conn->outbuf_=ret.serialize();
+                        
+                        break;
+                    case ServiceCode::signup:
+                        break;
+                    default:
+                        break;
+                    }
                 }
                 else
-                {
-                    conn->excepter_(conn);
-                    return;
-                }
+                    log_debug("parse not ok");
             }
+            // else if (n == 0)
+            // {
+
+            //     if (errno == EAGAIN || errno == EWOULDBLOCK)
+            //     {
+            //         break;
+            //     }
+            //     else if (errno == EINTR)
+            //     {
+            //         continue;
+            //     }
+            //     else
+            //     {
+            //         conn->excepter_(conn);
+            //         return;
+            //     }
+            // }
             else
             {
                 conn->excepter_(conn);
@@ -194,10 +224,14 @@ public:
         epoller_.del(conn->client_->fd());
         conns_.erase(conn->client_->fd());
     }
+    mysqlpp::Connection* get(){
+        return dbconns.get();
+    }
+    void ret(mysqlpp::Connection*conn){
+        dbconns.ret(conn);
+    }
 };
-
-void service(unique_ptr<Connection> &conn, const Request r)
+void inthandler(int)
 {
-    string msg = r.user_ + "# " + r.msg_ + "\r\n";
-    conn->outbuf_ += msg;
+
 }
