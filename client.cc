@@ -21,7 +21,7 @@ void sender(unique_ptr<Connection> &conn)
     while (!conn->outbuf_.empty())
     {
         auto n = send(conn->client_->fd(), conn->outbuf_.c_str(), conn->outbuf_.size(), 0);
-        //log_debug("sendding n={}", n);
+        // log_debug("sendding n={}", n);
         if (n > 0)
         {
             conn->outbuf_.erase(0, n);
@@ -49,18 +49,18 @@ future<int> receiver(unique_ptr<Connection> &conn)
     while (1)
     {
         bzero(buf, sizeof(buf));
-        //log_debug("trying to read data from server");
+        log_debug("trying to read data from server");
         auto n = recv(conn->client_->fd(), buf, sizeof(buf) - 1, 0);
         if (n > 0)
         {
             // buf[n-1]=0;buf[n-2]=0;
             conn->inbuf_ += buf;
-            //log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, conn->inbuf_.size());
+            // log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, conn->inbuf_.size());
             Response res;
             bool ok = Response::parse_response(conn->inbuf_, &res);
             if (ok)
             {
-                //log_debug("parse ok");
+                // log_debug("parse ok");
                 switch (res.servcode_)
                 {
                 case ServiceCode::login:
@@ -105,10 +105,9 @@ future<int> receiver(unique_ptr<Connection> &conn)
         else
         {
             log_error("server shut down\n");
-            exit(0);
+            break;
         }
-
-    } 
+    }
     return ret;
 }
 
@@ -119,7 +118,7 @@ int signup(unique_ptr<Connection> &conn)
     int ret;
     cout << format("input your name: ");
     cin >> username;
-    r.uid_=username;
+    r.uid_ = username;
     cout << format("input you passwd: ");
     cin >> r.msg_;
     conn->outbuf_ = r.serialize();
@@ -137,7 +136,7 @@ int login(unique_ptr<Connection> &conn)
     r.uid_ = userid;
     cout << format("input you passwd: ");
     cin >> r.msg_;
-    //log_debug("client send: {}", r.serialize());
+    // log_debug("client send: {}", r.serialize());
     conn->outbuf_ = r.serialize();
     sender(conn);
     ret = receiver(conn).get();
@@ -145,7 +144,7 @@ int login(unique_ptr<Connection> &conn)
 }
 void query_username(unique_ptr<Connection> &conn, int uid)
 {
-    //log_debug("query_username trigger\n");
+    // log_debug("query_username trigger\n");
     Request r;
     r.servcode_ = ServiceCode::query_uname,
     r.msg_ = to_string(uid);
@@ -172,7 +171,7 @@ int handle_login(const Response &res)
     else if (res.stuscode_ == StatusCode::ok)
     {
         username = res.msg_;
-        //log_debug("username: {} userid: {}", username, userid);
+        // log_debug("username: {} userid: {}", username, userid);
 
         uid_to_name[stoi(userid)] = username;
         cout << format("welcome back, {}\n", username);
@@ -188,7 +187,7 @@ int handle_signup(const Response &res)
     else if (res.stuscode_ == StatusCode::ok)
     {
         cout << format("hello, {},your id is {},please remember.\n", username, res.uid_);
-        userid=res.uid_;
+        userid = res.uid_;
     }
     return res.stuscode_ == StatusCode::ok ? 0 : 1;
 }
@@ -220,26 +219,32 @@ again:
     if (notok)
         goto again;
     cout << "=====CHATNOW=====\n";
-    workers.submit([&]()
+    promise<void> pro;
+    auto f = pro.get_future();
+    workers.submit([&]()->void
                    {
         while (true)
         {
             // //log_debug("receiving msg in child thread");
             receiver(conn);
+            if(f.wait_for(1us)!=std::future_status::timeout)break;
         } });
     string msg;
     Request r;
     r.uid_ = userid;
     r.servcode_ = ServiceCode::postmsg;
-    cout<<"input quit to shut down the program\n";
+    cout << "input quit to shut down the program\n";
     while (getline(cin, msg))
     {
 
-        if(!strcasecmp(msg.c_str(),"quit"))break;
+        if (!strcasecmp(msg.c_str(), "quit"))
+            break;
         r.msg_ = msg;
         conn->outbuf_ = r.serialize();
         sender(conn);
     }
-
+    pro.set_value();
+    conn.reset();
+    workers.shutdown();
     return 0;
 }

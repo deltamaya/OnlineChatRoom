@@ -33,7 +33,7 @@ public:
         {
             // cout<<"joinging\n";
             cv_.notify_all();
-            if(th.joinable())th.join();
+            if(th.joinable())th.detach();
         }
     }
     ThreadPool() : cv_(), mtx_(), tasks_(), shutdown_(), workers()
