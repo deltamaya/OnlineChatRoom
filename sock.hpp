@@ -40,12 +40,12 @@ public:
     }
     Sock(int fd) : fd_(fd)
     {
-        log_debug("sock {} opened",fd_);
+        //log_debug("sock {} opened",fd_);
         len_ = sizeof(addr_);
     }
     ~Sock()
     {
-        log_debug("sock {} closed",fd_);
+        //log_debug("sock {} closed",fd_);
         close(fd_);
     }
     const int fd()
@@ -88,7 +88,7 @@ public:
     }
     unique_ptr<Sock> acc()
     {
-        log_debug("fd:{}",fd_);
+        //log_debug("fd:{}",fd_);
         sockaddr_in addr;
         socklen_t len;
         int cfd = accept(fd_, (sockaddr *)&addr, &len);

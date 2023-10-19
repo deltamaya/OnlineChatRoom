@@ -24,7 +24,7 @@ class EpollServer
 public:
     EpollServer(): lsnfd(socket(AF_INET, SOCK_STREAM, 0))
     {
-        log_debug("lsnfd: {}",lsnfd);
+        //log_debug("lsnfd: {}",lsnfd);
     }
     ~EpollServer()
     {
@@ -75,7 +75,7 @@ public:
             auto event = epoller_.events_[i];
             int fd = event.data.fd;
             auto type = event.events;
-            // log_debug("get event");
+            // //log_debug("get event");
             if (type & EPOLLERR || type & EPOLLHUP)
                 type |= (EPOLLIN | EPOLLOUT);
             if (type & EPOLLIN)
@@ -109,7 +109,7 @@ public:
     // aka reader, read bytes from a connection's buffer and parse it into a response if possible
     void receiver(unique_ptr<Connection> &conn)
     {
-        log_debug("receive ok");
+        //log_debug("receive ok");
         char buf[bufsize];
         do
         {
@@ -119,17 +119,17 @@ public:
             {
                 // buf[n-1]=0;buf[n-2]=0;
                 conn->inbuf_ += buf;
-                log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, conn->inbuf_.size());
+                //log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, conn->inbuf_.size());
 
                 Request request;
                 bool ok = Request::parse_request(conn->inbuf_, &request);
                 Response ret;
                 mysqlpp::Connection *dbconn = nullptr;
-                log_debug("parsing");
+                //log_debug("parsing");
                 if (ok)
                 {
-                    log_debug("parse ok");
-                    log_debug("parsed request: {}", request.serialize());
+                    //log_debug("parse ok");
+                    //log_debug("parsed request: {}", request.serialize());
                     epoller_.rwcfg(conn, true, true);
                     // TODO
                     switch (request.servcode_)
@@ -140,34 +140,42 @@ public:
                         {
                             if(k!=lsnfd)
                                 epoller_.rwcfg(v,true,true);
-                            log_debug("sending msg to client: {}:{}",v->client_->ip(),v->client_->port());
+                            //log_debug("sending msg to client: {}:{}",v->client_->ip(),v->client_->port());
                             v->outbuf_ = request.serialize();
                         }
                         break;
                     case ServiceCode::login:
                         dbconn = conn->svr->get();
-                        log_debug("login triggered\n");
+                        //log_debug("login triggered\n");
                         ret = handle_login(dbconn, request);
                         conn->svr->ret(dbconn);
-                        log_debug("login response: {}", ret.serialize());
+                        //log_debug("login response: {}", ret.serialize());
                         conn->outbuf_ = ret.serialize();
 
                         break;
                     case ServiceCode::signup:
+                        dbconn = conn->svr->get();
+                        //log_debug("signup triggered\n");
+                        ret = handle_signup(dbconn, request);
+                        conn->svr->ret(dbconn);
+                        //log_debug("signup response: {}", ret.serialize());
+                        conn->outbuf_ = ret.serialize();
                         break;
                     case ServiceCode::query_uname:
                         dbconn = conn->svr->get();
-                        log_debug("query triggered\n");
+                        //log_debug("query triggered\n");
                         ret = handle_query_username(dbconn, request);
                         conn->svr->ret(dbconn);
-                        log_debug("query response: {}", ret.serialize());
+                        //log_debug("query response: {}", ret.serialize());
                         conn->outbuf_ = ret.serialize();
                     default:
                         break;
                     }
+                }else{
+                     //log_debug("parse not ok");
                 }
-                else
-                    log_debug("parse not ok");
+                
+                   
             }
             // else if (n == 0)
             // {
@@ -198,11 +206,11 @@ public:
     // send to a connection's output buffer, you should always make sure that you sent a valid response's serialization
     void sender(unique_ptr<Connection> &conn)
     {
-        // log_debug("sender triggered");
+        // //log_debug("sender triggered");
         do
         {
             auto n = send(conn->client_->fd(), conn->outbuf_.c_str(), conn->outbuf_.size(), 0);
-            log_debug("sendding n={}", n);
+            //log_debug("sendding n={}", n);
             if (n > 0)
             {
                 conn->outbuf_.erase(0, n);

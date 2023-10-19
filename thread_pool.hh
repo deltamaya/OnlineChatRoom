@@ -39,7 +39,8 @@ public:
                 task();
                 // printf("***************thread %lld: task end******************\n",this_thread::get_id());
 
-            } });
+            }
+            workers[i].detach(); });
         }
     }
     template <typename Func, typename... Args>
@@ -56,5 +57,12 @@ public:
         //lg.log(Debug,"task size:{} ",tasks_.size());
         cv_.notify_one();
         return result;
+    }
+    using iterator=decltype(workers.begin());
+    iterator begin(){
+        return workers.begin();
+    }
+    iterator end(){
+        return workers.end();
     }
 };

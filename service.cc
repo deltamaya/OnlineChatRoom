@@ -15,10 +15,17 @@ Response handle_login(mysqlpp::Connection *conn, const Request &r)
     log_debug("{}", query_string);
     auto get_user = conn->query(query_string);
     get_user.disable_exceptions();
-    auto result = get_user.store();
-    ret.stuscode_ = result ? StatusCode::ok : StatusCode::error;
-    if (result)
-        ret.msg_ = string(result[0][1]);
+
+    if (get_user)
+    {
+        auto result = get_user.store();
+        ret.stuscode_ = result ? StatusCode::ok : StatusCode::error;
+        if (result)
+            ret.msg_ = string(result[0][1]);
+    }else{
+        ret.stuscode_ = StatusCode::error;
+    }
+
     return ret;
 }
 Response handle_query_username(mysqlpp::Connection *conn, const Request &r)
@@ -33,10 +40,30 @@ Response handle_query_username(mysqlpp::Connection *conn, const Request &r)
     ret.stuscode_ = result ? StatusCode::ok : StatusCode::error;
     if (result)
         ret.msg_ = string(result[0][0]);
-    ret.uid_=r.msg_;
+    ret.uid_ = r.msg_;
     return ret;
 }
+Response handle_signup(mysqlpp::Connection *conn, const Request &r)
+{
+    Response ret;
 
+    ret.servcode_ = ServiceCode::signup;
+    string query_string = format("insert into Users(name,pwd) value('{}',password('{}'))", r.uid_, r.msg_);
+    log_debug("{}", query_string);
+    auto insert = conn->query(query_string);
+    insert.disable_exceptions();
+    auto result = insert.execute();
+    ret.stuscode_ = result ? StatusCode::ok : StatusCode::error;
+
+    string query_auto_increment = format("select last_insert_id();");
+    auto auto_increment = conn->query(query_auto_increment);
+    auto_increment.disable_exceptions();
+    auto cur_uid_result = auto_increment.store();
+    if (cur_uid_result)
+        ret.uid_ = string(cur_uid_result[0][0]);
+
+    return ret;
+}
 // int signup()
 // {
 // }
