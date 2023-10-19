@@ -12,9 +12,9 @@
 constexpr uint16_t default_port = 55369;
 using namespace std;
 
-
 class EpollServer
 {
+    const int lsnfd;
     DBConnPool<7> dbconns;
     ThreadPool<7> workers;
     // aka connections, key: a connection's fd
@@ -22,8 +22,9 @@ class EpollServer
     Epoller epoller_; // epoll
 
 public:
-    EpollServer()
+    EpollServer(): lsnfd(socket(AF_INET, SOCK_STREAM, 0))
     {
+        log_debug("lsnfd: {}",lsnfd);
     }
     ~EpollServer()
     {
@@ -32,13 +33,12 @@ public:
 
     void bootup()
     {
-        auto lsnsock = make_unique<Sock>(socket(AF_INET, SOCK_STREAM, 0), default_port);
+        auto lsnsock = make_unique<Sock>(lsnfd, default_port);
         lsnsock->bd();
         lsnsock->lsn();
-        auto lsn = make_unique<Connection>(std::move(lsnsock),this);
+        auto lsn = make_unique<Connection>(std::move(lsnsock), this);
         lsn->register_callback(std::bind(&EpollServer::accepter, this, std::placeholders::_1), nullptr, nullptr);
         add_conn(std::move(lsn), EPOLLIN | EPOLLET);
-
         while (true)
         {
             int timeout = 1000;
@@ -98,7 +98,7 @@ public:
     {
         do
         {
-            auto clientconn = make_unique<Connection>(conn->client_->acc(),this);
+            auto clientconn = make_unique<Connection>(conn->client_->acc(), this);
             clientconn->register_callback(std::bind(&EpollServer::receiver, this, std::placeholders::_1),
                                           std::bind(&EpollServer::sender, this, std::placeholders::_1),
                                           std::bind(&EpollServer::excepter, this, std::placeholders::_1));
@@ -124,30 +124,44 @@ public:
                 Request request;
                 bool ok = Request::parse_request(conn->inbuf_, &request);
                 Response ret;
-                mysqlpp::Connection*dbconn=nullptr;
+                mysqlpp::Connection *dbconn = nullptr;
                 log_debug("parsing");
                 if (ok)
                 {
                     log_debug("parse ok");
-                    log_debug("parsed request: {}",request.serialize());
+                    log_debug("parsed request: {}", request.serialize());
                     epoller_.rwcfg(conn, true, true);
                     // TODO
                     switch (request.servcode_)
                     {
                     case ServiceCode::postmsg:
 
+                        for (auto &[k, v] : conns_)
+                        {
+                            if(k!=lsnfd)
+                                epoller_.rwcfg(v,true,true);
+                            log_debug("sending msg to client: {}:{}",v->client_->ip(),v->client_->port());
+                            v->outbuf_ = request.serialize();
+                        }
                         break;
                     case ServiceCode::login:
-                            dbconn=conn->svr->get();
-                            log_debug("login triggered\n");
-                            ret=handle_login(dbconn,request);
-                            conn->svr->ret(dbconn);
-                            log_debug("login response: {}",ret.serialize());
-                            conn->outbuf_=ret.serialize();
-                        
+                        dbconn = conn->svr->get();
+                        log_debug("login triggered\n");
+                        ret = handle_login(dbconn, request);
+                        conn->svr->ret(dbconn);
+                        log_debug("login response: {}", ret.serialize());
+                        conn->outbuf_ = ret.serialize();
+
                         break;
                     case ServiceCode::signup:
                         break;
+                    case ServiceCode::query_uname:
+                        dbconn = conn->svr->get();
+                        log_debug("query triggered\n");
+                        ret = handle_query_username(dbconn, request);
+                        conn->svr->ret(dbconn);
+                        log_debug("query response: {}", ret.serialize());
+                        conn->outbuf_ = ret.serialize();
                     default:
                         break;
                     }
@@ -224,14 +238,15 @@ public:
         epoller_.del(conn->client_->fd());
         conns_.erase(conn->client_->fd());
     }
-    mysqlpp::Connection* get(){
+    mysqlpp::Connection *get()
+    {
         return dbconns.get();
     }
-    void ret(mysqlpp::Connection*conn){
+    void ret(mysqlpp::Connection *conn)
+    {
         dbconns.ret(conn);
     }
 };
 void inthandler(int)
 {
-
 }

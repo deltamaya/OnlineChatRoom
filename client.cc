@@ -9,12 +9,13 @@
 #include "epoller.hpp"
 using namespace std;
 int handle_signup(const Response &res);
-int handle_msg(const Response &res);
+int handle_msg(unique_ptr<Connection> &conn, const Response &res);
 int handle_login(const Response &res);
 const string serveraddr = "127.0.0.1";
 const uint16_t port = 55369;
-string userid, pwd,username;
+string userid, pwd, username;
 ThreadPool<5> workers;
+unordered_map<int, string> uid_to_name;
 void sender(unique_ptr<Connection> &conn)
 {
     while (!conn->outbuf_.empty())
@@ -45,9 +46,10 @@ future<int> receiver(unique_ptr<Connection> &conn)
 {
     future<int> ret;
     char buf[bufsize];
-    do
+    while (1)
     {
         bzero(buf, sizeof(buf));
+        log_debug("trying to read data from server");
         auto n = recv(conn->client_->fd(), buf, sizeof(buf) - 1, 0);
         if (n > 0)
         {
@@ -58,6 +60,7 @@ future<int> receiver(unique_ptr<Connection> &conn)
             bool ok = Response::parse_response(conn->inbuf_, &res);
             if (ok)
             {
+                log_debug("parse ok");
                 switch (res.servcode_)
                 {
                 case ServiceCode::login:
@@ -67,8 +70,10 @@ future<int> receiver(unique_ptr<Connection> &conn)
                     ret = workers.submit(handle_signup, res);
                     break;
                 case ServiceCode::postmsg:
-                    ret = workers.submit(handle_msg, res);
+                    ret = workers.submit(handle_msg, ref(conn), res);
                     break;
+                case ServiceCode::query_uname:
+                    uid_to_name[stoi(res.uid_)] = res.msg_;
                 default:
                     break;
                 }
@@ -80,13 +85,30 @@ future<int> receiver(unique_ptr<Connection> &conn)
                 continue;
             }
         }
+        // else if (n == 0)
+        //     {
+
+        //         if (errno == EAGAIN || errno == EWOULDBLOCK)
+        //         {
+        //             break;
+        //         }
+        //         else if (errno == EINTR)
+        //         {
+        //             continue;
+        //         }
+        //         else
+        //         {
+        //             conn->excepter_(conn);
+        //             exit(0);
+        //         }
+        //     }
         else
         {
             log_error("server shut down\n");
             exit(0);
         }
 
-    } while (true);
+    } 
     return ret;
 }
 
@@ -96,7 +118,7 @@ int signup(unique_ptr<Connection> &conn)
     r.servcode_ = ServiceCode::signup;
     int ret;
     cout << format("input your name: ");
-    cin >> r.user_;
+    cin >> r.uid_;
     cout << format("input you passwd: ");
     cin >> r.msg_;
     conn->outbuf_ = r.serialize();
@@ -110,18 +132,34 @@ int login(unique_ptr<Connection> &conn)
     r.servcode_ = ServiceCode::login;
     int ret;
     cout << format("input your id: ");
-    cin >> r.user_;
+    cin >> userid;
+    r.uid_ = userid;
     cout << format("input you passwd: ");
     cin >> r.msg_;
-    log_debug("client send: {}",r.serialize());
+    log_debug("client send: {}", r.serialize());
     conn->outbuf_ = r.serialize();
     sender(conn);
     ret = receiver(conn).get();
     return ret;
 }
-int handle_msg(const Response &res)
+void query_username(unique_ptr<Connection> &conn, int uid)
 {
-    cout << format("[{}]# {}\n", res.user_, res.msg_);
+    log_debug("query_username trigger\n");
+    Request r;
+    r.servcode_ = ServiceCode::query_uname,
+    r.msg_ = to_string(uid);
+    conn->outbuf_ = r.serialize();
+    sender(conn);
+}
+int handle_msg(unique_ptr<Connection> &conn, const Response &res)
+{
+    int uid = stoi(res.uid_);
+    while (!uid_to_name.contains(uid))
+    {
+        query_username(conn, uid);
+        this_thread::sleep_for(100ms);
+    }
+    cout << format("[{}]# {}\n", uid_to_name[stoi(res.uid_)], res.msg_);
     return 0;
 }
 int handle_login(const Response &res)
@@ -131,8 +169,11 @@ int handle_login(const Response &res)
         cout << "wrong password or userid\n";
     }
     else if (res.stuscode_ == StatusCode::ok)
-    username=res.msg_;
     {
+        username = res.msg_;
+        log_debug("username: {} userid: {}", username, userid);
+
+        uid_to_name[stoi(userid)] = username;
         cout << format("welcome back, {}\n", username);
     }
     return res.stuscode_ == StatusCode::ok ? 0 : 1;
@@ -145,7 +186,7 @@ int handle_signup(const Response &res)
     }
     else if (res.stuscode_ == StatusCode::ok)
     {
-        cout << format("hello, {},your id is {},please remember.\n", res.user_, res.msg_);
+        cout << format("hello, {},your id is {},please remember.\n", res.uid_, res.msg_);
     }
     return res.stuscode_ == StatusCode::ok ? 0 : 1;
 }
@@ -156,7 +197,7 @@ int main()
     // Sock local(socket(AF_INET,SOCK_STREAM,0));
     local->bd();
     local->conn(serveraddr, port);
-    auto conn = make_unique<Connection>(std::move(local),nullptr);
+    auto conn = make_unique<Connection>(std::move(local), nullptr);
 
     int choice;
 again:
@@ -169,27 +210,30 @@ again:
         notok = signup(conn);
         break;
     case 2:
-        notok=login(conn);
+        notok = login(conn);
         break;
     default:
         exit(0);
     }
-    if(notok)goto again;
+    if (notok)
+        goto again;
     cout << "=====CHATNOW=====\n";
     workers.submit([&]()
                    {
         while (true)
         {
+            log_debug("receiving msg in child thread");
             receiver(conn);
         } });
-        string msg;
-    while (getline(cin,msg))
+    string msg;
+    Request r;
+    r.uid_ = userid;
+    r.servcode_ = ServiceCode::postmsg;
+    while (getline(cin, msg))
     {
-        Request r;
-        r.user_=userid;
-        r.servcode_=ServiceCode::postmsg;
-        r.msg_=msg;
-        conn->outbuf_=r.serialize();
+
+        r.msg_ = msg;
+        conn->outbuf_ = r.serialize();
         sender(conn);
     }
     return 0;

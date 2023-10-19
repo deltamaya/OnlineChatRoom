@@ -10,6 +10,7 @@ enum class ServiceCode:uint8_t
     postmsg,
     signup,
     login,
+    query_uname
 };
 enum class StatusCode:uint8_t{
     ok,
@@ -21,11 +22,11 @@ class Request
 public:
 
     using enum ServiceCode;
-    string user_;
+    string uid_;
     string msg_;
     ServiceCode servcode_;
     StatusCode stuscode_;
-    Request():user_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok){
+    Request():uid_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok){
 
     }
     static bool parse_request(string&str,Request* r){
@@ -41,7 +42,7 @@ public:
     {
         Json::Value ret;
         Json::FastWriter writer;
-        ret["user"] = user_;
+        ret["uid"] = uid_;
         ret["stuscode"] = static_cast<int>(stuscode_);
         ret["servcode"] = static_cast<int>(servcode_);
         ret["msg"] = msg_;
@@ -53,7 +54,7 @@ public:
         Json::Reader reader;
         Json::Value v;
         reader.parse(str,v);
-        user_=v["user"].asString();
+        uid_=v["uid"].asString();
         msg_=v["msg"].asString();
         servcode_=static_cast<ServiceCode>(v["servcode"].asInt());
         stuscode_=static_cast<StatusCode>(v["stuscode"].asInt());
@@ -64,18 +65,18 @@ class Response
 {
     public:
     using enum ServiceCode;
-    string user_;
+    string uid_;
     string msg_;
     ServiceCode servcode_;
     StatusCode stuscode_;
-    Response():user_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok){
+    Response():uid_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok){
 
     }
     static bool parse_response(string&str,Response* r){
         auto pos=str.find(SEP);
         if(pos!=string::npos){
             r->deserialize(str.substr(0,pos));
-            str.erase(0,pos);
+            str.erase(0,pos+strlen(SEP));
             return true;
         }
         return false;
@@ -84,7 +85,7 @@ class Response
     {
         Json::Value ret;
         Json::FastWriter writer;
-        ret["user"] = user_;
+        ret["uid"] = uid_;
         ret["stuscode"] = static_cast<int>(stuscode_);
         ret["servcode"] = static_cast<int>(servcode_);
         ret["msg"] = msg_;
@@ -96,7 +97,7 @@ class Response
         Json::Reader reader;
         Json::Value v;
         reader.parse(str,v);
-        user_=v["user"].asString();
+        uid_=v["uid"].asString();
         msg_=v["msg"].asString();
         servcode_=static_cast<ServiceCode>(v["servcode"].asInt());
         stuscode_=static_cast<StatusCode>(v["stuscode"].asInt());

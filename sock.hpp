@@ -88,12 +88,13 @@ public:
     }
     unique_ptr<Sock> acc()
     {
-        
+        log_debug("fd:{}",fd_);
         sockaddr_in addr;
         socklen_t len;
         int cfd = accept(fd_, (sockaddr *)&addr, &len);
         auto ret=make_unique<Sock>(cfd);
         ret->addr_=addr;
+        ret->len_=len;
         if (cfd == -1)
         {
             perror("accept");
