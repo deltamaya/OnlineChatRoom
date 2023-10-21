@@ -64,27 +64,3 @@ Response handle_signup(mysqlpp::Connection *conn, const Request &r)
 
     return ret;
 }
-// int signup()
-// {
-// }
-// int login()
-// {
-//     mysqlpp::StoreQueryResult result;
-//     do
-//     {
-//         cout << format("input your id: ");
-//         cin >> userid;
-//         cout << format("input you passwd: ");
-//         cin >> pwd;
-//         string query_string=format("select * from Users where id={} and pwd=password('{}');",userid,pwd);
-//         auto get_user = conn.query(query_string);
-//         log_debug("{}",query_string);
-//         get_user.disable_exceptions();
-//         result=get_user.store();
-//         if(!result)cout<<"wrong password\n";
-//     } while (result.empty());
-//     string uid(result[0][0]);
-//     string uname(result[0][1]);
-//     cout<<format("hello, {}, your id is {}\n",uname,uid);
-//     return 0;
-// }

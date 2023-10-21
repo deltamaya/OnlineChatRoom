@@ -49,7 +49,7 @@ future<int> receiver(unique_ptr<Connection> &conn)
     while (1)
     {
         bzero(buf, sizeof(buf));
-        log_debug("trying to read data from server");
+        // log_debug("trying to read data from server");
         auto n = recv(conn->client_->fd(), buf, sizeof(buf) - 1, 0);
         if (n > 0)
         {

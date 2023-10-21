@@ -26,7 +26,8 @@ public:
     string msg_;
     ServiceCode servcode_;
     StatusCode stuscode_;
-    Request():uid_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok){
+    string to_whom_;
+    Request():uid_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok),to_whom_(){
 
     }
     static bool parse_request(string&str,Request* r){
@@ -69,7 +70,8 @@ class Response
     string msg_;
     ServiceCode servcode_;
     StatusCode stuscode_;
-    Response():uid_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok){
+    string to_whom_;
+    Response():uid_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok),to_whom_(){
 
     }
     static bool parse_response(string&str,Response* r){

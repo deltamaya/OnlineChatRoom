@@ -135,7 +135,12 @@ public:
                     switch (request.servcode_)
                     {
                     case ServiceCode::postmsg:
-
+                        // dbconn = conn->svr->get();
+                        // //log_debug("login triggered\n");
+                        // ret = handle_postmsg(dbconn, request);
+                        // conn->svr->ret(dbconn);
+                        // //log_debug("login response: {}", ret.serialize());
+                        // conn->outbuf_ = ret.serialize();
                         for (auto &[k, v] : conns_)
                         {
                             if(k!=lsnfd)
