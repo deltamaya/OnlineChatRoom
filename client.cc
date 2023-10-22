@@ -61,7 +61,7 @@ future<int> receiver(unique_ptr<Connection> &conn)
             if (ok)
             {
                 // log_debug("parse ok");
-                switch (res.servcode_)
+                switch (res.service_)
                 {
                 case ServiceCode::login:
                     ret = workers.submit(handle_login, res);
@@ -114,7 +114,7 @@ future<int> receiver(unique_ptr<Connection> &conn)
 int signup(unique_ptr<Connection> &conn)
 {
     Request r;
-    r.servcode_ = ServiceCode::signup;
+    r.service_ = ServiceCode::signup;
     int ret;
     cout << format("input your name: ");
     cin >> username;
@@ -129,7 +129,7 @@ int signup(unique_ptr<Connection> &conn)
 int login(unique_ptr<Connection> &conn)
 {
     Request r;
-    r.servcode_ = ServiceCode::login;
+    r.service_ = ServiceCode::login;
     int ret;
     cout << format("input your id: ");
     cin >> userid;
@@ -146,7 +146,7 @@ void query_username(unique_ptr<Connection> &conn, int uid)
 {
     // log_debug("query_username trigger\n");
     Request r;
-    r.servcode_ = ServiceCode::query_uname,
+    r.service_ = ServiceCode::query_uname,
     r.msg_ = to_string(uid);
     conn->outbuf_ = r.serialize();
     sender(conn);
@@ -164,11 +164,11 @@ int handle_msg(unique_ptr<Connection> &conn, const Response &res)
 }
 int handle_login(const Response &res)
 {
-    if (res.stuscode_ == StatusCode::error)
+    if (res.status_ == StatusCode::error)
     {
         cout << "wrong password or userid\n";
     }
-    else if (res.stuscode_ == StatusCode::ok)
+    else if (res.status_ == StatusCode::ok)
     {
         username = res.msg_;
         // log_debug("username: {} userid: {}", username, userid);
@@ -176,20 +176,20 @@ int handle_login(const Response &res)
         uid_to_name[stoi(userid)] = username;
         cout << format("welcome back, {}\n", username);
     }
-    return res.stuscode_ == StatusCode::ok ? 0 : 1;
+    return res.status_ == StatusCode::ok ? 0 : 1;
 }
 int handle_signup(const Response &res)
 {
-    if (res.stuscode_ == StatusCode::error)
+    if (res.status_ == StatusCode::error)
     {
         cout << "can not sign up for now\n";
     }
-    else if (res.stuscode_ == StatusCode::ok)
+    else if (res.status_ == StatusCode::ok)
     {
         cout << format("hello, {},your id is {},please remember.\n", username, res.uid_);
         userid = res.uid_;
     }
-    return res.stuscode_ == StatusCode::ok ? 0 : 1;
+    return res.status_ == StatusCode::ok ? 0 : 1;
 }
 
 int main()
@@ -232,7 +232,7 @@ again:
     string msg;
     Request r;
     r.uid_ = userid;
-    r.servcode_ = ServiceCode::postmsg;
+    r.service_ = ServiceCode::postmsg;
     cout << "input quit to shut down the program\n";
     while (getline(cin, msg))
     {

@@ -128,19 +128,20 @@ public:
                 //log_debug("parsing");
                 if (ok)
                 {
-                    //log_debug("parse ok");
+                    log_debug("parse ok");
                     //log_debug("parsed request: {}", request.serialize());
                     epoller_.rwcfg(conn, true, true);
                     // TODO
-                    switch (request.servcode_)
+                    switch (request.service_)
                     {
                     case ServiceCode::postmsg:
                         // dbconn = conn->svr->get();
                         // //log_debug("login triggered\n");
                         // ret = handle_postmsg(dbconn, request);
                         // conn->svr->ret(dbconn);
-                        // //log_debug("login response: {}", ret.serialize());
+                        log_debug("login response: {}", ret.serialize());
                         // conn->outbuf_ = ret.serialize();
+                        
                         for (auto &[k, v] : conns_)
                         {
                             if(k!=lsnfd)
@@ -154,7 +155,7 @@ public:
                         //log_debug("login triggered\n");
                         ret = handle_login(dbconn, request);
                         conn->svr->ret(dbconn);
-                        //log_debug("login response: {}", ret.serialize());
+                        log_debug("login response: {}", ret.serialize());
                         conn->outbuf_ = ret.serialize();
 
                         break;
@@ -177,7 +178,7 @@ public:
                         break;
                     }
                 }else{
-                     //log_debug("parse not ok");
+                     log_debug("parse not ok");
                 }
                 
                    

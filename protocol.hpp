@@ -24,10 +24,10 @@ public:
     using enum ServiceCode;
     string uid_;
     string msg_;
-    ServiceCode servcode_;
-    StatusCode stuscode_;
+    ServiceCode service_;
+    StatusCode status_;
     string to_whom_;
-    Request():uid_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok),to_whom_(){
+    Request():uid_(),msg_(),service_(ServiceCode::postmsg),status_(StatusCode::ok),to_whom_(){
 
     }
     static bool parse_request(string&str,Request* r){
@@ -44,9 +44,10 @@ public:
         Json::Value ret;
         Json::FastWriter writer;
         ret["uid"] = uid_;
-        ret["stuscode"] = static_cast<int>(stuscode_);
-        ret["servcode"] = static_cast<int>(servcode_);
+        ret["status"] = static_cast<int>(status_);
+        ret["service"] = static_cast<int>(service_);
         ret["msg"] = msg_;
+        ret["towhom"]=to_whom_;
         auto retstr=writer.write(ret);
         retstr.pop_back();
         return retstr+SEP;
@@ -57,8 +58,9 @@ public:
         reader.parse(str,v);
         uid_=v["uid"].asString();
         msg_=v["msg"].asString();
-        servcode_=static_cast<ServiceCode>(v["servcode"].asInt());
-        stuscode_=static_cast<StatusCode>(v["stuscode"].asInt());
+        to_whom_=v["towhom"].asString();
+        service_=static_cast<ServiceCode>(v["service"].asInt());
+        status_=static_cast<StatusCode>(v["status"].asInt());
     }
 };
 
@@ -68,10 +70,10 @@ class Response
     using enum ServiceCode;
     string uid_;
     string msg_;
-    ServiceCode servcode_;
-    StatusCode stuscode_;
+    ServiceCode service_;
+    StatusCode status_;
     string to_whom_;
-    Response():uid_(),msg_(),servcode_(ServiceCode::postmsg),stuscode_(StatusCode::ok),to_whom_(){
+    Response():uid_(),msg_(),service_(ServiceCode::postmsg),status_(StatusCode::ok),to_whom_(){
 
     }
     static bool parse_response(string&str,Response* r){
@@ -88,9 +90,10 @@ class Response
         Json::Value ret;
         Json::FastWriter writer;
         ret["uid"] = uid_;
-        ret["stuscode"] = static_cast<int>(stuscode_);
-        ret["servcode"] = static_cast<int>(servcode_);
+        ret["status"] = static_cast<int>(status_);
+        ret["service"] = static_cast<int>(service_);
         ret["msg"] = msg_;
+        ret["towhom"]=to_whom_;
         auto retstr=writer.write(ret);
         retstr.pop_back();
         return retstr+SEP;
@@ -101,7 +104,8 @@ class Response
         reader.parse(str,v);
         uid_=v["uid"].asString();
         msg_=v["msg"].asString();
-        servcode_=static_cast<ServiceCode>(v["servcode"].asInt());
-        stuscode_=static_cast<StatusCode>(v["stuscode"].asInt());
+        to_whom_=v["towhom"].asString();
+        service_=static_cast<ServiceCode>(v["service"].asInt());
+        status_=static_cast<StatusCode>(v["status"].asInt());
     }
 };
