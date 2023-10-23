@@ -105,7 +105,7 @@ future<int> receiver(unique_ptr<Connection> &conn)
         else
         {
             log_error("server shut down\n");
-            break;
+            exit(0);
         }
     }
     return ret;

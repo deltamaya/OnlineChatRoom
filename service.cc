@@ -18,6 +18,7 @@ Response handle_login(mysqlpp::Connection *conn, const Request &r)
     auto result = get_user.store();
     if (result.num_rows()>0)
     {
+        ret.uid_=r.uid_;
         ret.msg_ = string(result[0][1]);
         ret.status_ = StatusCode::ok ;
     }
@@ -38,6 +39,7 @@ Response handle_query_username(mysqlpp::Connection *conn, const Request &r)
     if (result.num_rows()>0)
         ret.msg_ = string(result[0][0]);
     ret.uid_ = r.msg_;
+    log_debug("{}",ret.serialize());
     return ret;
 }
 Response handle_signup(mysqlpp::Connection *conn, const Request &r)
