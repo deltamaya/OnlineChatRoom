@@ -5,7 +5,9 @@
 #include <thread>
 #include "protocol.hpp"
 #include "minilog.hh"
-Response handle_login(mysqlpp::Connection*conn,const Request&r);
-Response handle_query_username(mysqlpp::Connection *conn, const Request &r);
-Response handle_signup(mysqlpp::Connection *conn, const Request &r);
-Response handle_postmsg(mysqlpp::Connection *conn, const Request &r);
+void handle_login(unique_ptr<Connection>&,const Request&r);
+void handle_query_username(unique_ptr<Connection>&, const Request &r);
+void handle_signup(unique_ptr<Connection>&, const Request &r);
+void handle_postmsg(unique_ptr<Connection>&, const Request &r);
+void handle_query_history(unique_ptr<Connection>&, const Request &r);
+void handle_cd(unique_ptr<Connection>&, const Request &r);

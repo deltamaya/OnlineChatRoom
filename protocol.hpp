@@ -7,10 +7,12 @@ using namespace std;
 constexpr size_t bufsize = 1024;
 enum class ServiceCode:uint8_t
 {
-    postmsg,
-    signup,
-    login,
-    query_uname
+    postmsg, //to whom:gid
+    signup,//uid: username/msg:pwd
+    login,//uid:uid/msg:pwd
+    query_uname,//uid:uid
+    query_history,//to whom: gid/ msg:count
+    cd,//to whom:cur/ gid msg:target gid
 };
 enum class StatusCode:uint8_t{
     ok,

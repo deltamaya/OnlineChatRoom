@@ -13,7 +13,7 @@ int handle_msg(unique_ptr<Connection> &conn, const Response &res);
 int handle_login(const Response &res);
 const string serveraddr = "127.0.0.1";
 const uint16_t port = 55369;
-string userid, pwd, username;
+string userid, pwd, username, group = "null", gid = "null";
 ThreadPool<5> workers;
 unordered_map<int, string> uid_to_name;
 void sender(unique_ptr<Connection> &conn)
@@ -74,6 +74,12 @@ future<int> receiver(unique_ptr<Connection> &conn)
                     break;
                 case ServiceCode::query_uname:
                     uid_to_name[stoi(res.uid_)] = res.msg_;
+                case ServiceCode::query_history:
+                    break;
+                case ServiceCode::cd:
+                    group = res.msg_;
+                    gid = res.to_whom_;
+                    break;
                 default:
                     break;
                 }
@@ -159,7 +165,7 @@ int handle_msg(unique_ptr<Connection> &conn, const Response &res)
         query_username(conn, uid);
         this_thread::sleep_for(100ms);
     }
-    cout << format("[{}]# {}\n", uid_to_name[stoi(res.uid_)], res.msg_);
+    cout << format("[{} : {}]# {}\n", group, uid_to_name[stoi(res.uid_)], res.msg_);
     return 0;
 }
 int handle_login(const Response &res)
@@ -221,7 +227,7 @@ again:
     cout << "=====CHATNOW=====\n";
     promise<void> pro;
     auto f = pro.get_future();
-    workers.submit([&]()->void
+    workers.submit([&]() -> void
                    {
         while (true)
         {
@@ -231,17 +237,74 @@ again:
         } });
     string msg;
     Request r;
-    r.uid_ = userid;
-    r.service_ = ServiceCode::postmsg;
-    cout << "input quit to shut down the program\n";
+    cout << "input help to get useful info\n";
     while (getline(cin, msg))
     {
-
-        if (!strcasecmp(msg.c_str(), "quit"))
+        r.uid_ = userid;
+        r.service_ = ServiceCode::postmsg;
+        r.to_whom_ = gid;
+        if (msg.find("##") != string::npos)
+        {
+            cout << "you cant type '##' because it was used to seperate messages\n";
+            continue;
+        }
+        auto smsg = istringstream(msg);
+        string command;
+        string body;
+        smsg >> command;
+        if (!strcasecmp(command.c_str(), "quit"))
+        {
             break;
-        r.msg_ = msg;
-        conn->outbuf_ = r.serialize();
-        sender(conn);
+        }
+        else if (!strcasecmp(command.c_str(), "show"))
+        {
+        }
+        else if (!strcasecmp(command.c_str(), "help"))
+        {
+            cout << format("----------\nsend [your message]\t--to send message to other people\nhistory [line count]\t--to get chat history(less than 100)\nshow\t\t\t--to show your contacts\ncd [group number]\t--change your destination that your message was post\nquit\t\t\t--to quit the program\n----------\n");
+        }
+        else if (!strcasecmp(command.c_str(), "send"))
+        {
+            r.msg_ = smsg.str().substr(smsg.tellg() - 0, -1);
+            conn->outbuf_ = r.serialize();
+            sender(conn);
+        }
+        else if (!strcasecmp(command.c_str(), "history"))
+        {
+            smsg >> body;
+            int count = 0;
+            try
+            {
+                count = stoi(body);
+                if (count > 100)
+                {
+                    cout << "too large, please type a number less than 100\n";
+                    continue;
+                }
+                r.service_ = ServiceCode::query_history;
+                r.msg_ = to_string(count);
+                conn->outbuf_ = r.serialize();
+                sender(conn);
+            }
+            catch (...)
+            {
+                cout << "usage: history [line count]\n"
+                     << endl;
+            }
+        }
+        else if (!strcasecmp(command.c_str(), "cd"))
+        {
+            smsg >> body;
+            r.service_ = ServiceCode::cd;
+            r.to_whom_ = "null";
+            r.msg_ = body;
+            conn->outbuf_ = r.serialize();
+            sender(conn);
+        }
+        else
+        {
+            cout << "usage error, type 'help' to get more useful info\n";
+        }
     }
     pro.set_value();
     conn.reset();
