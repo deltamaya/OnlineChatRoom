@@ -5,6 +5,8 @@
 #include <thread>
 #include "protocol.hpp"
 #include "minilog.hh"
+#include "connection.hpp"
+
 void handle_login(unique_ptr<Connection>&,const Request&r);
 void handle_query_username(unique_ptr<Connection>&, const Request &r);
 void handle_signup(unique_ptr<Connection>&, const Request &r);

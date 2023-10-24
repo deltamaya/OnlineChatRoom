@@ -15,7 +15,7 @@ using namespace std;
 
 class EpollServer
 {
-    public:
+public:
     const int lsnfd;
     DBConnPool<7> dbconns;
     ThreadPool<7> workers;
@@ -23,7 +23,6 @@ class EpollServer
     // aka connections, key: a connection's fd
     unordered_map<int, unique_ptr<Connection>> conns_;
     Epoller epoller_; // epoll
-
 
     unordered_map<int, unordered_set<int>> gid_to_users_;
     EpollServer() : lsnfd(socket(AF_INET, SOCK_STREAM, 0))
@@ -43,16 +42,17 @@ class EpollServer
         auto lsn = make_unique<Connection>(std::move(lsnsock), this);
         lsn->register_callback(std::bind(&EpollServer::accepter, this, std::placeholders::_1), nullptr, nullptr);
         add_conn(std::move(lsn), EPOLLIN | EPOLLET);
-        auto dbconn=dbconns.get();
-        string query_groups=format("select * from Groups;");
-        auto query=dbconn->query(query_groups);
-        auto result=query.store();
-        if(result.num_rows()>0){
-            for(auto &row:result){
-                gid_to_users_.insert(stoi(string(row[0])),{});
-                log_debug("{}",stoi(string(row[0])));
+        auto dbconn = dbconns.get();
+        string query_groups = format("select * from Groups;");
+        auto query = dbconn->query(query_groups);
+        auto result = query.store();
+        if (result.num_rows() > 0)
+        {
+            for (int i = 0; i < result.num_rows(); ++i)
+            {
+                gid_to_users_.insert({stoi(string(result[i][0])), unordered_set<int>()});
+                log_debug("{}", stoi(string(result[i][0])));
             }
-            
         }
         while (true)
         {
@@ -161,7 +161,7 @@ class EpollServer
                     case ServiceCode::query_uname:
                         handle_query_username(conn, request);
                     case ServiceCode::query_history:
-                        handle_query_history(conn, request);
+                        //handle_query_history(conn, request);
                         break;
                     case ServiceCode::cd:
                         handle_cd(conn, request);

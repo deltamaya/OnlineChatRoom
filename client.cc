@@ -21,7 +21,7 @@ void sender(unique_ptr<Connection> &conn)
     while (!conn->outbuf_.empty())
     {
         auto n = send(conn->client_->fd(), conn->outbuf_.c_str(), conn->outbuf_.size(), 0);
-        // log_debug("sendding n={}", n);
+        log_debug("sendding n={}", n);
         if (n > 0)
         {
             conn->outbuf_.erase(0, n);
@@ -77,6 +77,11 @@ future<int> receiver(unique_ptr<Connection> &conn)
                 case ServiceCode::query_history:
                     break;
                 case ServiceCode::cd:
+                    log_debug("changing gid nad gname");
+                    if(res.status_==StatusCode::error){
+                        cout<<"your group id is not correct, use 'show' to show your contacts\n";
+                        break;
+                    }
                     group = res.msg_;
                     gid = res.to_whom_;
                     break;
@@ -111,6 +116,7 @@ future<int> receiver(unique_ptr<Connection> &conn)
         else
         {
             log_error("server shut down\n");
+            workers.shutdown();
             exit(0);
         }
     }
@@ -220,6 +226,7 @@ again:
         notok = login(conn);
         break;
     default:
+        workers.shutdown();
         exit(0);
     }
     if (notok)
@@ -258,6 +265,8 @@ again:
         }
         else if (!strcasecmp(command.c_str(), "show"))
         {
+            cout<<"uninplemented\n";
+            continue;
         }
         else if (!strcasecmp(command.c_str(), "help"))
         {
@@ -265,12 +274,20 @@ again:
         }
         else if (!strcasecmp(command.c_str(), "send"))
         {
-            r.msg_ = smsg.str().substr(smsg.tellg() - 0, -1);
+            if(gid=="null"){
+                cout<<"you need use 'cd' to focus on a group\n";
+                continue;
+            }
+            r.msg_ = smsg.str().substr(smsg.tellg(), -1);
             conn->outbuf_ = r.serialize();
             sender(conn);
         }
         else if (!strcasecmp(command.c_str(), "history"))
         {
+            if(gid=="null"){
+                cout<<"you need use 'cd' to focus on a group\n";
+                continue;
+            }
             smsg >> body;
             int count = 0;
             try
@@ -296,7 +313,6 @@ again:
         {
             smsg >> body;
             r.service_ = ServiceCode::cd;
-            r.to_whom_ = "null";
             r.msg_ = body;
             conn->outbuf_ = r.serialize();
             sender(conn);
