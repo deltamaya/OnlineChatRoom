@@ -31,7 +31,7 @@ void handle_login(unique_ptr<Connection> &conn, const Request &r)
     }
     else
         ret.status_ = StatusCode::error;
-    log_debug("handle login ok");
+    // log_debug("handle login ok");
 
     log_debug("login response: {}", ret.serialize());
     conn->outbuf_ = ret.serialize();
@@ -51,7 +51,7 @@ void handle_query_username(unique_ptr<Connection> &conn, const Request &r)
     if (result.num_rows() > 0)
         ret.msg_ = string(result[0][0]);
     ret.uid_ = r.msg_;
-    log_debug("login response: {}", ret.serialize());
+    log_debug("queryname response: {}", ret.serialize());
     conn->outbuf_ = ret.serialize();
 }
 void handle_signup(unique_ptr<Connection> &conn, const Request &r)
@@ -95,8 +95,8 @@ void handle_postmsg(unique_ptr<Connection> &conn, const Request &r)
     auto &users = conn->svr->gid_to_users_[stoi(r.to_whom_)];
     log_debug("working on gid:{}", stoi(r.to_whom_));
     for (auto &user : users)
-    {
-        log_debug("sending msg to [{}:{}]", conn->client_->ip(), conn->client_->port());
+   {
+        log_debug("sending msg to [{}:{}]", conn->svr->conns_[user]->client_->ip(), conn->svr->conns_[user]->client_->port());
         conn->svr->epoller_.rwcfg(conn->svr->conns_[user], true, true);
         conn->svr->conns_[user]->outbuf_ = ret.serialize();
     }
@@ -128,6 +128,31 @@ void handle_cd(unique_ptr<Connection> &conn, const Request &r)
     }
     log_debug("{}",ret.serialize());
     conn->outbuf_ = ret.serialize();
+}
+void handle_query_history(unique_ptr<Connection>&conn, const Request &r){
+    auto dbconn=conn->svr->get();
+    Response ret;
+    string query_string=format("select uid,msg from History where gid={} limit {};",r.to_whom_,r.msg_);
+    log_debug("{}",query_string);
+    auto query=dbconn->query(query_string);
+    query.disable_exceptions();
+    auto result=query.store();
+    result.disable_exceptions();
+    ret.service_=ServiceCode::query_history;
+    ret.uid_=r.uid_;
+    ret.to_whom_=r.to_whom_;
+    if(result.num_rows()>0){
+        ret.status_=StatusCode::ok;
+        for(int i=0;i<result.num_rows();i++){
+            ret.msg_+=format("{}#{}#",string(result[i][0]),string(result[i][1]));
+            log_debug("{}",format("{}#{}#",string(result[i][0]),string(result[i][1])));
+        }
+    }else{
+        ret.status_=StatusCode::error;
+    }
+    log_debug("{}",ret.serialize());
+    conn->outbuf_=ret.serialize();
+
 }
 int main(){
     // signal(SIGINT,inthandler);

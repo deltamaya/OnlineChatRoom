@@ -7,10 +7,12 @@
 #include "connection.hpp"
 #include "thread_pool.hh"
 #include "epoller.hpp"
+#include <regex>
 using namespace std;
 int handle_signup(const Response &res);
 int handle_msg(unique_ptr<Connection> &conn, const Response &res);
 int handle_login(const Response &res);
+void handle_query_history(unique_ptr<Connection> &conn, const Response &res);
 const string serveraddr = "127.0.0.1";
 const uint16_t port = 55369;
 string userid, pwd, username, group = "null", gid = "null";
@@ -73,13 +75,18 @@ future<int> receiver(unique_ptr<Connection> &conn)
                     ret = workers.submit(handle_msg, ref(conn), res);
                     break;
                 case ServiceCode::query_uname:
+                    log_debug("QUERY_NAME ok");
                     uid_to_name[stoi(res.uid_)] = res.msg_;
+                    break;
                 case ServiceCode::query_history:
+                    // log_debug("history");
+                    workers.submit(handle_query_history, ref(conn), res);
                     break;
                 case ServiceCode::cd:
-                    log_debug("changing gid nad gname");
-                    if(res.status_==StatusCode::error){
-                        cout<<"your group id is not correct, use 'show' to show your contacts\n";
+                    log_debug("changing gid and groupname");
+                    if (res.status_ == StatusCode::error)
+                    {
+                        cout << "your group id is not correct, use 'show' to show your contacts\n";
                         break;
                     }
                     group = res.msg_;
@@ -163,6 +170,7 @@ void query_username(unique_ptr<Connection> &conn, int uid)
     conn->outbuf_ = r.serialize();
     sender(conn);
 }
+
 int handle_msg(unique_ptr<Connection> &conn, const Response &res)
 {
     int uid = stoi(res.uid_);
@@ -203,10 +211,40 @@ int handle_signup(const Response &res)
     }
     return res.status_ == StatusCode::ok ? 0 : 1;
 }
+void handle_query_history(unique_ptr<Connection> &conn, const Response &res)
+{
+    // log_debug("ok");
+    int count = 0, pos = 0, prev = 0;
+    int uid = 0;
+    if (res.status_ == StatusCode::error)
+        return;
+    while ((pos = res.msg_.find("#", prev)) != string::npos)
+    {
+
+        ++count;
+        if (count % 2 == 0)
+        {
+            cout << format("[{} : {}]# {}\n", group, uid_to_name[uid], res.msg_.substr(prev, pos - prev));
+        }
+        else
+        {
+            uid = stoi(res.msg_.substr(prev, pos - prev));
+            while (!uid_to_name.contains(uid))
+            {
+                query_username(conn, uid);
+                this_thread::sleep_for(100ms);
+            }
+        }
+        log_debug("prev:{} pos:{}", prev, pos);
+        prev = pos + strlen("#");
+    }
+}
 
 int main()
 {
     auto local = make_unique<Sock>(socket(AF_INET, SOCK_STREAM, 0));
+    int opt = 1;
+    setsockopt(local->fd(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
     // Sock local(socket(AF_INET,SOCK_STREAM,0));
     local->bd();
     local->conn(serveraddr, port);
@@ -250,9 +288,9 @@ again:
         r.uid_ = userid;
         r.service_ = ServiceCode::postmsg;
         r.to_whom_ = gid;
-        if (msg.find("##") != string::npos)
+        if (msg.find("#") != string::npos)
         {
-            cout << "you cant type '##' because it was used to seperate messages\n";
+            cout << "you cant type '#' because it was used to seperate messages\n";
             continue;
         }
         auto smsg = istringstream(msg);
@@ -265,7 +303,7 @@ again:
         }
         else if (!strcasecmp(command.c_str(), "show"))
         {
-            cout<<"uninplemented\n";
+            cout << "uninplemented\n";
             continue;
         }
         else if (!strcasecmp(command.c_str(), "help"))
@@ -274,18 +312,23 @@ again:
         }
         else if (!strcasecmp(command.c_str(), "send"))
         {
-            if(gid=="null"){
-                cout<<"you need use 'cd' to focus on a group\n";
+            if (gid == "null")
+            {
+                cout << "you need use 'cd' to focus on a group\n";
                 continue;
             }
             r.msg_ = smsg.str().substr(smsg.tellg(), -1);
             conn->outbuf_ = r.serialize();
             sender(conn);
         }
+        else if (!strcasecmp(command.c_str(), "create"))
+        {
+        }
         else if (!strcasecmp(command.c_str(), "history"))
         {
-            if(gid=="null"){
-                cout<<"you need use 'cd' to focus on a group\n";
+            if (gid == "null")
+            {
+                cout << "you need use 'cd' to focus on a group\n";
                 continue;
             }
             smsg >> body;
@@ -305,7 +348,7 @@ again:
             }
             catch (...)
             {
-                cout << "usage: history [line count]\n"
+                cout << "usage: history [0,100)\n"
                      << endl;
             }
         }

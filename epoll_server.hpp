@@ -139,7 +139,6 @@ public:
                 Request request;
                 bool ok = Request::parse_request(conn->inbuf_, &request);
                 Response ret;
-                mysqlpp::Connection *dbconn = nullptr;
                 // log_debug("parsing");
                 if (ok)
                 {
@@ -160,8 +159,9 @@ public:
                         break;
                     case ServiceCode::query_uname:
                         handle_query_username(conn, request);
+                        break;
                     case ServiceCode::query_history:
-                        //handle_query_history(conn, request);
+                        handle_query_history(conn, request);
                         break;
                     case ServiceCode::cd:
                         handle_cd(conn, request);
