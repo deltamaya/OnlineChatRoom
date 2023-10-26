@@ -83,14 +83,41 @@ future<int> receiver(unique_ptr<Connection> &conn)
                     workers.submit(handle_query_history, ref(conn), res);
                     break;
                 case ServiceCode::cd:
-                    log_debug("changing gid and groupname");
+
                     if (res.status_ == StatusCode::error)
                     {
                         cout << "your group id is not correct, use 'show' to show your contacts\n";
                         break;
                     }
-                    group = res.msg_;
-                    gid = res.to_whom_;
+                    else
+                    {
+                        cout << "changed your group now\n";
+                        group = res.msg_;
+                        gid = res.to_whom_;
+                    }
+
+                    break;
+                case ServiceCode::create_group:
+                    log_debug("creating group");
+                    if (res.status_ == StatusCode::ok)
+                    {
+                        cout << format("your just created the group, group id: {}", res.msg_);
+                    }
+                    else
+                    {
+                        cout << format("create group failed");
+                    }
+                    break;
+                case ServiceCode::join:
+                    log_debug("join");
+                    if (res.status_ == StatusCode::ok)
+                    {
+                        cout << format("you have successfully joined the group");
+                    }
+                    else
+                    {
+                        cout << format("you can't join the group");
+                    }
                     break;
                 default:
                     break;
@@ -321,8 +348,19 @@ again:
             conn->outbuf_ = r.serialize();
             sender(conn);
         }
-        else if (!strcasecmp(command.c_str(), "create"))
+        else if (!strcasecmp(command.c_str(), "creategroup"))
         {
+            string group_name;
+            smsg >> group_name;
+            if (group_name.find(SEP) != string::npos)
+            {
+                cout << "you can't create a group with '##' because it was used to seperate messages";
+                continue;
+            }
+            r.service_ = ServiceCode::create_group;
+            r.msg_ = group_name;
+            conn->outbuf_ = r.serialize();
+            sender(conn);
         }
         else if (!strcasecmp(command.c_str(), "history"))
         {
@@ -351,6 +389,15 @@ again:
                 cout << "usage: history [0,100)\n"
                      << endl;
             }
+        }
+        else if (!strcasecmp(command.c_str(), "join"))
+        {
+            string groupid;
+            smsg >> groupid;
+            r.service_ = ServiceCode::join;
+            r.msg_ = groupid;
+            conn->outbuf_ = r.serialize();
+            sender(conn);
         }
         else if (!strcasecmp(command.c_str(), "cd"))
         {

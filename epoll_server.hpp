@@ -166,6 +166,12 @@ public:
                     case ServiceCode::cd:
                         handle_cd(conn, request);
                         break;
+                    case ServiceCode::create_group:
+                        handle_create_group(conn, request);
+                        break;
+                    case ServiceCode::join:
+                        handle_join(conn,request);
+                    break;
                     default:
                         break;
                     }

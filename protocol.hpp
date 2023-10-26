@@ -13,6 +13,8 @@ enum class ServiceCode:uint8_t
     query_uname,//uid:uid
     query_history,//to whom: gid/ msg:count
     cd,//to whom:cur/ gid msg:target gid
+    create_group,//msg: group name
+    join
 };
 enum class StatusCode:uint8_t{
     ok,

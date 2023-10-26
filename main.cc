@@ -95,7 +95,7 @@ void handle_postmsg(unique_ptr<Connection> &conn, const Request &r)
     auto &users = conn->svr->gid_to_users_[stoi(r.to_whom_)];
     log_debug("working on gid:{}", stoi(r.to_whom_));
     for (auto &user : users)
-   {
+    {
         log_debug("sending msg to [{}:{}]", conn->svr->conns_[user]->client_->ip(), conn->svr->conns_[user]->client_->port());
         conn->svr->epoller_.rwcfg(conn->svr->conns_[user], true, true);
         conn->svr->conns_[user]->outbuf_ = ret.serialize();
@@ -110,54 +110,121 @@ void handle_cd(unique_ptr<Connection> &conn, const Request &r)
     auto insert = dbconn->query(query_string);
     insert.disable_exceptions();
     auto result = insert.store();
+    ret.service_=ServiceCode::cd;
+    if (result.num_rows() > 0)
+    {
+        string exist_query_string = format("select * from UserGroup where uid={} and gid={};", r.uid_, r.msg_);
+        log_debug("{}", exist_query_string);
+        auto exists = dbconn->query(query_string);
+        exists.disable_exceptions();
+        auto existsresult = exists.store();
+        if (existsresult.num_rows() > 0)
+        {
+            log_debug("num row is {}",existsresult.num_rows());
+            ret.status_ = StatusCode::ok;
+            ret.uid_ = r.uid_;
+            ret.msg_ = string(result[0][0]);
+            ret.to_whom_ = r.msg_;
+            if (r.to_whom_ != "null")
+            {
+                conn->svr->gid_to_users_[stoi(r.msg_)].erase(conn->client_->fd());
+            }
+            conn->svr->gid_to_users_[stoi(r.msg_)].insert(conn->client_->fd());
+        }
+        else
+        {
+            log_debug("no user in the group");
+            ret.status_ = StatusCode::error;
+        }
+    }
+    else
+    {
+        ret.status_ = StatusCode::error;
+    }
+    log_debug("{}", ret.serialize());
     conn->svr->ret(dbconn);
+    conn->outbuf_ = ret.serialize();
+}
+void handle_query_history(unique_ptr<Connection> &conn, const Request &r)
+{
+    auto dbconn = conn->svr->get();
+    Response ret;
+    string query_string = format("select uid,msg from History where gid={} limit {};", r.to_whom_, r.msg_);
+    log_debug("{}", query_string);
+    auto query = dbconn->query(query_string);
+    query.disable_exceptions();
+    auto result = query.store();
+    result.disable_exceptions();
+    ret.service_ = ServiceCode::query_history;
+    ret.uid_ = r.uid_;
+    ret.to_whom_ = r.to_whom_;
     if (result.num_rows() > 0)
     {
         ret.status_ = StatusCode::ok;
-        ret.uid_ = r.uid_;
-        ret.msg_ = string(result[0][0]);
-        ret.to_whom_ = r.msg_;
-        ret.service_ = ServiceCode::cd;
-        if(r.to_whom_!="null"){
-            conn->svr->gid_to_users_[stoi(r.msg_)].erase(conn->client_->fd());
+        for (int i = 0; i < result.num_rows(); i++)
+        {
+            ret.msg_ += format("{}#{}#", string(result[i][0]), string(result[i][1]));
+            log_debug("{}", format("{}#{}#", string(result[i][0]), string(result[i][1])));
         }
-        conn->svr->gid_to_users_[stoi(r.msg_)].insert(conn->client_->fd());
     }
-    else{
-        ret.status_=StatusCode::error;
+    else
+    {
+        ret.status_ = StatusCode::error;
     }
-    log_debug("{}",ret.serialize());
+    log_debug("{}", ret.serialize());
+    conn->svr->ret(dbconn);
     conn->outbuf_ = ret.serialize();
 }
-void handle_query_history(unique_ptr<Connection>&conn, const Request &r){
-    auto dbconn=conn->svr->get();
+void handle_create_group(unique_ptr<Connection> &conn, const Request &r)
+{
+    auto dbconn = conn->svr->get();
     Response ret;
-    string query_string=format("select uid,msg from History where gid={} limit {};",r.to_whom_,r.msg_);
-    log_debug("{}",query_string);
-    auto query=dbconn->query(query_string);
+    ret.service_=ServiceCode::create_group;
+    string query_string = format("insert into Groups(name) value('{}');", r.msg_);
+    log_debug("{}", query_string);
+    auto query = dbconn->query(query_string);
     query.disable_exceptions();
-    auto result=query.store();
-    result.disable_exceptions();
-    ret.service_=ServiceCode::query_history;
-    ret.uid_=r.uid_;
-    ret.to_whom_=r.to_whom_;
-    if(result.num_rows()>0){
-        ret.status_=StatusCode::ok;
-        for(int i=0;i<result.num_rows();i++){
-            ret.msg_+=format("{}#{}#",string(result[i][0]),string(result[i][1]));
-            log_debug("{}",format("{}#{}#",string(result[i][0]),string(result[i][1])));
-        }
-    }else{
-        ret.status_=StatusCode::error;
+    auto result = query.execute();
+    auto groupid = result.insert_id();
+    if (result)
+    {
+        ret.status_ = StatusCode::ok;
+        ret.msg_ = groupid;
+        conn->svr->gid_to_users_.insert({groupid, {}});
     }
-    log_debug("{}",ret.serialize());
-    conn->outbuf_=ret.serialize();
-
+    else
+    {
+        ret.status_ = StatusCode::error;
+    }
+    conn->svr->ret(dbconn);
+    conn->outbuf_ = ret.serialize();
 }
-int main(){
+void handle_join(unique_ptr<Connection> &conn, const Request &r)
+{
+    auto dbconn = conn->svr->get();
+    Response ret;
+    ret.service_=ServiceCode::join;
+    string query_string = format("insert into UserGroup value({},{});", r.uid_, r.msg_);
+    log_debug("{}", query_string);
+    auto query = dbconn->query(query_string);
+    query.disable_exceptions();
+    auto result = query.execute();
+    if (result)
+    {
+        ret.status_ = StatusCode::ok;
+    }
+    else
+    {
+        ret.status_ = StatusCode::error;
+    }
+    conn->svr->ret(dbconn);
+    conn->outbuf_ = ret.serialize();
+}
+int main()
+{
     // signal(SIGINT,inthandler);
-    signal(SIGCHLD,SIG_IGN);  
-    // sigignore(SIGCHLD); 
+    signal(SIGCHLD, SIG_IGN);
+    // sigignore(SIGCHLD);
     EpollServer svr;
     svr.bootup();
 }
