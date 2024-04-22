@@ -1,0 +1,4 @@
+/root/epollserver/build/CMakeFiles/server.dir
+/root/epollserver/build/CMakeFiles/client.dir
+/root/epollserver/build/CMakeFiles/edit_cache.dir
+/root/epollserver/build/CMakeFiles/rebuild_cache.dir
