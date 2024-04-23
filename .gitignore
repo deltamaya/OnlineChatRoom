@@ -1,2 +1,4 @@
-/cmake-build-debug-wsl
-/build
+cmake-build-debug-wsl
+build
+.idea
+.vscode

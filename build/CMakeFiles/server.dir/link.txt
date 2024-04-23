@@ -1,1 +1,0 @@
-/usr/sbin/c++ CMakeFiles/server.dir/src/handler.cc.o CMakeFiles/server.dir/src/main.cc.o CMakeFiles/server.dir/src/service.cc.o -o bin/server  -ljsoncpp -lpthread -lmysqlpp 
