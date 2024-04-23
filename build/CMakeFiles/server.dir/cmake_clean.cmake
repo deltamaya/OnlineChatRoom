@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/server.dir/src/handler.cc.o"
+  "CMakeFiles/server.dir/src/handler.cc.o.d"
   "CMakeFiles/server.dir/src/main.cc.o"
   "CMakeFiles/server.dir/src/main.cc.o.d"
   "CMakeFiles/server.dir/src/service.cc.o"

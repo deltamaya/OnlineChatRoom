@@ -6,65 +6,67 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <string_view>
-#include <string.h>
+#include <cstring>
 #include <sys/epoll.h>
 #include <cerrno>
 #include <vector>
 #include "connection.hpp"
 #include <format>
-using namespace minilog;
-class Epoller
-{
-    static constexpr size_t epoll_num = 64;
-    int epollfd_;
-
-public:
-    epoll_event events_[epoll_num];
-
-    Epoller()
+namespace tinychat{
+    using namespace minilog;
+    class Epoller
     {
-        epollfd_ = epoll_create(epoll_num);
-        if (epollfd_ < 0)
+        static constexpr size_t epoll_num = 64;
+        int epollfd_;
+    
+    public:
+        epoll_event events_[epoll_num];
+        
+        Epoller()
         {
-            perror("epoll create");
+            epollfd_ = ::epoll_create(epoll_num);
+            if (epollfd_ < 0)
+            {
+                ::perror("epoll create");
+            }
         }
-    }
-    ~Epoller(){
-        close(epollfd_);
-    }
-    void mod(int fd,uint32_t event){
-        epoll_event ev;
-        ev.data.fd=fd;
-        ev.events=event;
-        int ret=epoll_ctl(epollfd_,EPOLL_CTL_MOD,fd,&ev);
-        if(ret<0){
-            log_error("epoll modify failed");
+        ~Epoller(){
+            close(epollfd_);
         }
-    }
-    void add(int fd,uint32_t event)
-    {
-        epoll_event ev;
-        ev.data.fd = fd;
-        ev.events = event;
-        int ret = epoll_ctl(epollfd_, EPOLL_CTL_ADD, fd, &ev);
-        if (ret < 0)
+        void modify(int fd, uint32_t event){
+            epoll_event ev;
+            ev.data.fd=fd;
+            ev.events=event;
+            int ret=::epoll_ctl(epollfd_,EPOLL_CTL_MOD,fd,&ev);
+            if(ret<0){
+                log_error("epoll modify failed");
+            }
+        }
+        void add_event(int fd, uint32_t event)
         {
-            perror("epoll ctl");
+            epoll_event ev;
+            ev.data.fd = fd;
+            ev.events = event;
+            int ret = ::epoll_ctl(epollfd_, EPOLL_CTL_ADD, fd, &ev);
+            if (ret < 0)
+            {
+                ::perror("epoll ctl");
+            }
         }
-    }
-    void del(int fd)
-    {
-        int ret = epoll_ctl(epollfd_, EPOLL_CTL_DEL, fd, nullptr);
-        if (ret < 0)
+        void delete_event(int fd)
         {
-            perror("epoll ctl");
+            int ret = ::epoll_ctl(epollfd_, EPOLL_CTL_DEL, fd, nullptr);
+            if (ret < 0)
+            {
+                perror("epoll ctl");
+            }
         }
-    }
-    int wait(int timeout)
-    {
-        return epoll_wait(epollfd_, events_, epoll_num, timeout);
-    }
-    void rwcfg(unique_ptr<Connection>&conn,bool enable_read,bool enable_write){
-        mod(conn->client_->fd(),(enable_read?EPOLLIN:0) | (enable_write?EPOLLOUT:0)| EPOLLET);
-    }
-};
+        int wait(int timeout)
+        {
+            return ::epoll_wait(epollfd_, events_, epoll_num, timeout);
+        }
+        void rwcfg(std::unique_ptr<Connection>&conn,bool enable_read,bool enable_write){
+            this->modify(conn->client_->fd(), (enable_read ? EPOLLIN : 0) | (enable_write ? EPOLLOUT : 0) | EPOLLET);
+        }
+    };
+}

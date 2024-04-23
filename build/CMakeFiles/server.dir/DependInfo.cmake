@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/root/epollserver/src/handler.cc" "CMakeFiles/server.dir/src/handler.cc.o" "gcc" "CMakeFiles/server.dir/src/handler.cc.o.d"
   "/root/epollserver/src/main.cc" "CMakeFiles/server.dir/src/main.cc.o" "gcc" "CMakeFiles/server.dir/src/main.cc.o.d"
   "/root/epollserver/src/service.cc" "CMakeFiles/server.dir/src/service.cc.o" "gcc" "CMakeFiles/server.dir/src/service.cc.o.d"
   )

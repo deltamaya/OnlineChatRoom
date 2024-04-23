@@ -166,6 +166,30 @@ src/client.cc.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client.cc.s
 .PHONY : src/client.cc.s
 
+src/handler.o: src/handler.cc.o
+.PHONY : src/handler.o
+
+# target to build an object file
+src/handler.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/handler.cc.o
+.PHONY : src/handler.cc.o
+
+src/handler.i: src/handler.cc.i
+.PHONY : src/handler.i
+
+# target to preprocess a source file
+src/handler.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/handler.cc.i
+.PHONY : src/handler.cc.i
+
+src/handler.s: src/handler.cc.s
+.PHONY : src/handler.s
+
+# target to generate assembly for a file
+src/handler.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/handler.cc.s
+.PHONY : src/handler.cc.s
+
 src/main.o: src/main.cc.o
 .PHONY : src/main.o
 
@@ -227,6 +251,9 @@ help:
 	@echo "... src/client.o"
 	@echo "... src/client.i"
 	@echo "... src/client.s"
+	@echo "... src/handler.o"
+	@echo "... src/handler.i"
+	@echo "... src/handler.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

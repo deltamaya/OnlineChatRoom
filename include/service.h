@@ -7,11 +7,13 @@
 #include "minilog.hh"
 #include "connection.hpp"
 
-void handle_login(unique_ptr<Connection>&,const Request&r);
-void handle_query_username(unique_ptr<Connection>&, const Request &r);
-void handle_signup(unique_ptr<Connection>&, const Request &r);
-void handle_postmsg(unique_ptr<Connection>&, const Request &r);
-void handle_query_history(unique_ptr<Connection>&, const Request &r);
-void handle_cd(unique_ptr<Connection>&, const Request &r);
-void handle_create_group(unique_ptr<Connection>&conn,const Request & r);
-void handle_join(unique_ptr<Connection> &conn, const Request &r);
+namespace tinychat{
+    void handle_login(std::unique_ptr<tinychat::Connection>&,const Request&r);
+    void handle_query_username(std::unique_ptr<tinychat::Connection>&, const Request &r);
+    void handle_signup(std::unique_ptr<tinychat::Connection>&, const Request &r);
+    void handle_postmsg(std::unique_ptr<tinychat::Connection>&, const Request &r);
+    void handle_query_history(std::unique_ptr<tinychat::Connection>&, const Request &r);
+    void handle_cd(std::unique_ptr<tinychat::Connection>&, const Request &r);
+    void handle_create_group(std::unique_ptr<tinychat::Connection>&conn,const Request & r);
+    void handle_join(std::unique_ptr<tinychat::Connection> &conn, const Request &r);
+}

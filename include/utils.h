@@ -21,15 +21,17 @@
 #include <format>
 #include <chrono>
 
-using namespace std::string_literals;
-using namespace std::string_view_literals;
-
-enum Err : uint8_t
-{
-	OK,
-	LISTEN_ERR,
-	SOCKET_ERR,
-	BIND_ERR,
-	RECV_ERR,
-};
+namespace tinychat{
+    using namespace std::string_literals;
+    using namespace std::string_view_literals;
+    
+    enum Err : uint8_t
+    {
+        OK,
+        LISTEN_ERR,
+        SOCKET_ERR,
+        BIND_ERR,
+        RECV_ERR,
+    };
+}
 
