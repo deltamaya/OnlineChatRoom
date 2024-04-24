@@ -1,17 +1,25 @@
 cmake_minimum_required(VERSION 3.28)
 project(online_chatroom)
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ./bin)
+find_package(protobuf REQUIRED)
+find_package(absl REQUIRED)
+link_directories(${PROTOBUF_LIBRARY_DIRS})
+add_definitions(${PROTOBUF_LIBRARY_DIRS})
+include_directories(
+        ${PROTOBUF_LIBRARY_DIRS}
+)
 include_directories(./include)
-aux_source_directory(./src SERVERSRC)
-message("server source: ${SERVERSRC}")
-list(REMOVE_ITEM SERVERSRC ./src/client.cc)
-message("server source: ${SERVERSRC}")
+aux_source_directory(./src/server SERVERSRC)
 add_executable(server ${SERVERSRC}
-        src/handler.cc)
-target_link_libraries(server jsoncpp pthread mysqlpp)
-# add_definitions(-DDEBUG)
-# set(CMAKE_CXX_COMPILER clang++)
+        src/message.pb.cc
+        src/message.grpc.pb.cc
+)
+target_link_libraries(server PUBLIC jsoncpp pthread mysqlpp   protobuf::libprotobuf)
 
-add_executable(client ./src/client.cc)
-target_link_libraries(client jsoncpp pthread mysqlpp)
+
+aux_source_directory(./src/client CLIENTSRC)
+add_executable(client ${CLIENTSRC}
+        src/message.pb.cc
+        src/message.grpc.pb.cc)
+target_link_libraries(client PUBLIC jsoncpp pthread mysqlpp  protobuf::libprotobuf)
+

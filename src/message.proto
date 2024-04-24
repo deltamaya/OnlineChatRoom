@@ -1,0 +1,27 @@
+package tinychat;
+message ChatArg{
+  required int32 uid = 1;
+  required string msg = 2;
+  optional bool isGroup = 3;
+  optional int32 targetId = 4;
+}
+message LoginArg{
+  required string uid = 1;
+  required string password = 2;
+}
+message SignUpArg{
+  required string username = 1;
+  required string password = 2;
+}
+message CreateGroupArg{
+
+}
+message Status{
+  required int32 code = 1;
+}
+service Chat{
+  rpc PostMsg(ChatArg)returns (Status){}
+  rpc Login(LoginArg)returns (Status){}
+  rpc SignUp(SignUpArg)returns(Status){}
+  rpc CreateGroup(CreateGroupArg)returns(Status){}
+}

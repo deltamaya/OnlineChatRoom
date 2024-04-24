@@ -39,11 +39,12 @@ namespace tinychat{
                         log_error("connection fail, quit\n") ;
                         exit(1);
                     }
-                    std::cout << "trying to connect to database\n";
+                    minilog::log_debug("trying to connect to database\n");
                     std::this_thread::sleep_for(1s);
                     ++retry;
                 }
-                std::cout << "connected\n";
+                minilog::log_debug("connected to database\n");
+//                std::cout << "connected\n";
                 ready_.push(conn);
             }
         }

@@ -111,7 +111,7 @@ namespace minilog
         template <class... Args>
         void log_generic(LogLevel lev, details::_WithSourceLoc<std::format_string<Args...>> fmt_with_loc, Args &&...args)
         {
-            #ifdef DEBUG
+
             const auto &loc = fmt_with_loc.location();
             auto msg = std::vformat(fmt_with_loc.data().get(), std::make_format_args(args...));
             std::chrono::zoned_time now{std::chrono::current_zone(), std::chrono::high_resolution_clock::now()};
@@ -125,7 +125,6 @@ namespace minilog
                 std::cout << _MINILOG_IF_HAS_ANSI_COLORS(k_level_ansi_colors[(std::uint8_t)lev] +)
                     msg _MINILOG_IF_HAS_ANSI_COLORS(+ k_reset_ansi_color) + '\n';
             }
-            #endif
         }
     }
 #define _Function(name)                                                                                       \
