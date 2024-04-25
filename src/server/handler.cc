@@ -70,28 +70,23 @@ namespace tinychat{
         ret.uid_ = std::to_string(result.insert_id());
         conn->outbuf_ = ret.serialize();
     }
-    void handle_postmsg(std::unique_ptr<tinychat::Connection> &conn, const Request &r)
+    void handle_postmsg(std::unique_ptr<tinychat::Connection> &conn, const tinychat::Chat &r)
     {
         auto dbconn = conn->svr->get();
-        Response ret;
-        std::string query_string = format("insert into History value({},{},'{}');", r.uid_, r.to_whom_, r.msg_);
+        std::string query_string = format("insert into History value({},{},'{}');",r.uid(), r.targetid(), r.msg());
         log_debug("{}", query_string);
         auto insert = dbconn->query(query_string);
         insert.disable_exceptions();
         auto result = insert.execute();
         conn->svr->ret(dbconn);
-        ret.status_ = result ? StatusCode::ok : StatusCode::error;
-        ret.uid_ = r.uid_;
-        ret.msg_ = r.msg_;
-        ret.to_whom_ = r.to_whom_;
-        ret.service_ = ServiceCode::postmsg;
-        auto &users = conn->svr->gid_to_users_[stoi(r.to_whom_)];
-        log_debug("working on gid:{}", stoi(r.to_whom_));
+        
+        auto &users = conn->svr->gid_to_users_[r.targetid()];
+        log_debug("working on gid:{}", r.targetid());
         for (auto &user : users)
         {
             log_debug("sending msg to [{}:{}]", conn->svr->conns_[user]->client_->ip(), conn->svr->conns_[user]->client_->port());
             conn->svr->epoller_.rwcfg(conn->svr->conns_[user], true, true);
-            conn->svr->conns_[user]->outbuf_ = ret.serialize();
+            conn->svr->conns_[user]->outbuf_ =r.SerializeAsString();
         }
     }
     void handle_cd(std::unique_ptr<tinychat::Connection> &conn, const Request &r)

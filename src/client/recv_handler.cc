@@ -5,13 +5,12 @@
 
 using namespace std::chrono_literals;
 namespace tinychat{
-    int handle_msg(std::unique_ptr<Connection> &conn, const Response &res) {
-        int uid = stoi(res.uid_);
-        while (!uid_to_name.contains(uid)) {
-            query_username(conn, uid);
+    int handle_msg(std::unique_ptr<Connection> &conn, const Chat &res) {
+        while (!uid_to_name.contains(res.uid())) {
+            query_username(conn, res.uid());
             std::this_thread::sleep_for(100ms);
         }
-        std::cout << std::format("[{} : {}]# {}\n", group, uid_to_name[stoi(res.uid_)], res.msg_);
+        std::cout << std::format("[{} : {}]# {}\n", group, uid_to_name[res.uid()], res.msg());
         return 0;
     }
     

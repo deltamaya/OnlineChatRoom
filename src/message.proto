@@ -1,12 +1,12 @@
 package tinychat;
-message ChatArg{
+message Chat{
   required int32 uid = 1;
   required string msg = 2;
   optional bool isGroup = 3;
   optional int32 targetId = 4;
 }
 message LoginArg{
-  required string uid = 1;
+  required int32 uid = 1;
   required string password = 2;
 }
 message SignUpArg{
@@ -14,14 +14,63 @@ message SignUpArg{
   required string password = 2;
 }
 message CreateGroupArg{
+  required int32 uid = 1;
+  optional string name=2;
+}
+message QueryUsernameArg{
+  required int32 uid = 1;
+  required int32 targetId = 2;
+}
+message ChangeGroupArg{
+  required int32 uid = 1;
+  required int32 gid = 2;
+  optional int32 cfd=4;
+  optional int32 formerGid=5;
+}
+message JoinGroupArg{
+  required int32 uid = 1;
+  required int32 gid = 2;
+}
+message QueryHistoryArg{
+  required int32 uid = 1;
+  required int32 gid = 2;
+  required int32 begin = 3;
+  required int32 length = 4;
+}
+
+message ChatHistoryEntry{
+  required int32 who = 1;
+  required string what = 2;
+}
+message LoginReply{
+  optional bool ok = 1;
+}
+message SignUpReply{
+  optional int32 uid = 1;
+}
+message CreateGroupReply{
+  optional int32 gid = 1;
 
 }
-message Status{
-  required int32 code = 1;
+message QueryUsernameReply{
+  optional string username = 1;
 }
-service Chat{
-  rpc PostMsg(ChatArg)returns (Status){}
-  rpc Login(LoginArg)returns (Status){}
-  rpc SignUp(SignUpArg)returns(Status){}
-  rpc CreateGroup(CreateGroupArg)returns(Status){}
+message ChangeGroupReply{
+  optional bool ok = 1;
+}
+message JoinGroupReply{
+  optional bool ok = 1;
+}
+message QueryHistoryReply{
+  repeated ChatHistoryEntry chats = 1;
+}
+
+service EpollServices{
+  rpc Login(LoginArg)returns (LoginReply){}
+  rpc SignUp(SignUpArg)returns(SignUpReply){}
+  rpc CreateGroup(CreateGroupArg)returns(CreateGroupReply){}
+  rpc QueryUsername(QueryUsernameArg)returns(QueryUsernameReply){}
+  rpc ChangeGroup(ChangeGroupArg)returns(ChangeGroupReply){}
+  rpc JoinGroup(JoinGroupArg)returns(JoinGroupReply){}
+  rpc  QueryHistory(QueryHistoryArg)returns(QueryHistoryReply){}
 }

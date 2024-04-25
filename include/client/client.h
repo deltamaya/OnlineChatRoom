@@ -16,11 +16,13 @@
 #include "server/epoller.hpp"
 #include <regex>
 #include "message.pb.h"
+#include "message.grpc.pb.h"
+#include "grpc++/grpc++.h"
 
 namespace tinychat{
     int handle_signup(const Response &res);
     
-    int handle_msg(std::unique_ptr<Connection> &conn, const Response &res);
+    int handle_msg(std::unique_ptr<Connection> &conn, const Chat &res);
     
     int handle_login(const Response &res);
     
@@ -37,11 +39,12 @@ namespace tinychat{
     
     std::future<int> receiver(std::unique_ptr<Connection> &conn);
     void post_msg(std::unique_ptr<Connection> &conn,std::string);
-    
+
     constexpr uint16_t port = 55369;
-    inline std::string userid, pwd, username, group = "null", gid = "null";
+    inline std::string userid, username, group = "null", gid = "null";
     constexpr std::string serveraddr = "127.0.0.1";
     inline ThreadPool<5> workers;
     inline std::unordered_map<int, std::string> uid_to_name;
+    
 }
 #endif //ONLINE_CHATROOM_CLIENT_H

@@ -36,82 +36,13 @@ namespace tinychat{
                 // buf[n-1]=0;buf[n-2]=0;
                 conn->inbuf_ += buf;
                 // log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, connect->inbuf_.size());
-                Response res;
-                bool ok = Response::parse_response(conn->inbuf_, &res);
-                if (ok) {
-                    // log_debug("parse ok");
-                    switch (res.service_) {
-                        case ServiceCode::login:
-                            ret = workers.submit(handle_login, res);
-                            break;
-                        case ServiceCode::signup:
-                            ret = workers.submit(handle_signup, res);
-                            break;
-                        case ServiceCode::postmsg:
-                            ret = workers.submit(handle_msg, ref(conn), res);
-                            break;
-                        case ServiceCode::query_uname:
-                            log_debug("QUERY_NAME ok");
-                            uid_to_name[stoi(res.uid_)] = res.msg_;
-                            break;
-                        case ServiceCode::query_history:
-                            // log_debug("history");
-                            workers.submit(handle_query_history, ref(conn), res);
-                            break;
-                        case ServiceCode::cd:
-                            
-                            if (res.status_ == StatusCode::error) {
-                                std::cout << "your group id is not correct, use 'show' to show your contacts\n";
-                                break;
-                            } else {
-                                std::cout << "changed your group now\n";
-                                group = res.msg_;
-                                gid = res.to_whom_;
-                            }
-                            
-                            break;
-                        case ServiceCode::create_group:
-                            log_debug("creating group");
-                            if (res.status_ == StatusCode::ok) {
-                                std::cout << std::format("your just created the group, group id: {}", res.msg_);
-                            } else {
-                                std::cout << std::format("create group failed");
-                            }
-                            break;
-                        case ServiceCode::join:
-                            log_debug("join");
-                            if (res.status_ == StatusCode::ok) {
-                                std::cout << std::format("you have successfully joined the group");
-                            } else {
-                                std::cout << std::format("you can't join the group");
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                    
-                    break;
-                } else {
-                    continue;
-                }
-            }
-                // else if (n == 0)
-                //     {
+                Chat resp;
+                resp.ParseFromString(conn->inbuf_);
+                workers.submit(handle_msg, ref(conn), resp);
                 
-                //         if (errno == EAGAIN || errno == EWOULDBLOCK)
-                //         {
-                //             break;
-                //         }
-                //         else if (errno == EINTR)
-                //         {
-                //             continue;
-                //         }
-                //         else
-                //         {
-                //             conn->excepter_(connect);
-                //             exit(0);
-                //         }
-                //     }
+                
+            }
+            
             else {
                 log_error("server shut down\n");
                 workers.shutdown();
@@ -120,12 +51,18 @@ namespace tinychat{
         }
         return ret;
     }
+    auto channel=grpc::CreateChannel("localhost:50051",grpc::InsecureChannelCredentials());
+    
+    std::unique_ptr<EpollServices::Stub> stub=EpollServices::NewStub(channel);
 }
 
 
 using namespace tinychat;
+int cfd=-1;
+
 
 int main() {
+    
     auto local = std::make_unique<tinychat::Sock>(socket(AF_INET, SOCK_STREAM, 0));
     int opt = 1;
     setsockopt(local->fd(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
@@ -133,7 +70,10 @@ int main() {
     local->bind();
     local->connect(serveraddr, port);
     auto conn = std::make_unique<Connection>(std::move(local), nullptr);
-    
+    char buf[bufsize];
+    auto n = recv(conn->client_->fd(), buf, sizeof(buf) - 1, 0);
+    cfd=std::stoi(buf);
+    minilog::log_debug("my fd is {}",cfd);
     int choice;
 again:
     std::cout << "input 1 for signup, 2 to login, 0 for exit:> ";
@@ -177,7 +117,7 @@ again:
         std::string command;
         std::string body;
         smsg >> command;
-        smsg>>body;
+        smsg >> body;
         if (!strcasecmp(command.c_str(), "quit")) {
             break;
         } else if (!strcasecmp(command.c_str(), "show")) {
@@ -187,8 +127,8 @@ again:
             std::cout << std::format(
                     "----------\nsend [your message]\t--to send message to other people\nhistory [line count]\t--to get chat history(less than 100)\nshow\t\t\t--to show your contacts\ncd [group number]\t--change your destination that your message was post\nquit\t\t\t--to quit the program\n----------\n");
         } else if (!strcasecmp(command.c_str(), "send")) {
-            minilog::log_info("sending msg: {}",body);
-            post_msg(conn,std::move(body));
+            minilog::log_info("sending msg: {}", body);
+            post_msg(conn, std::move(body));
         } else if (!strcasecmp(command.c_str(), "creategroup")) {
             std::string group_name;
             smsg >> group_name;

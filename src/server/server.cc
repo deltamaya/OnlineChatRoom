@@ -10,13 +10,15 @@
 #include "minilog.hh"
 #include "service.h"
 using namespace minilog;
-
-
+namespace tinychat{
+    tinychat::EpollServer server;
+}
 int main()
 {
     // signal(SIGINT,inthandler);
     signal(SIGCHLD, SIG_IGN);
     // sigignore(SIGCHLD);
-    tinychat::EpollServer svr;
-    svr.boot();
+    std::string server_address("0.0.0.0:50051");
+    auto rpcServer=tinychat::RunRpcServer();
+    tinychat::server.boot();
 }

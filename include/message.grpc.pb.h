@@ -27,109 +27,169 @@
 
 namespace tinychat {
 
-class Chat final {
+class EpollServices final {
  public:
   static constexpr char const* service_full_name() {
-    return "tinychat.Chat";
+    return "tinychat.EpollServices";
   }
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    virtual ::grpc::Status PostMsg(::grpc::ClientContext* context, const ::tinychat::ChatArg& request, ::tinychat::Status* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>> AsyncPostMsg(::grpc::ClientContext* context, const ::tinychat::ChatArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>>(AsyncPostMsgRaw(context, request, cq));
+    virtual ::grpc::Status Login(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::tinychat::LoginReply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::LoginReply>> AsyncLogin(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::LoginReply>>(AsyncLoginRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>> PrepareAsyncPostMsg(::grpc::ClientContext* context, const ::tinychat::ChatArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>>(PrepareAsyncPostMsgRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::LoginReply>> PrepareAsyncLogin(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::LoginReply>>(PrepareAsyncLoginRaw(context, request, cq));
     }
-    virtual ::grpc::Status Login(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::tinychat::Status* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>> AsyncLogin(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>>(AsyncLoginRaw(context, request, cq));
+    virtual ::grpc::Status SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::tinychat::SignUpReply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::SignUpReply>> AsyncSignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::SignUpReply>>(AsyncSignUpRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>> PrepareAsyncLogin(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>>(PrepareAsyncLoginRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::SignUpReply>> PrepareAsyncSignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::SignUpReply>>(PrepareAsyncSignUpRaw(context, request, cq));
     }
-    virtual ::grpc::Status SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::tinychat::Status* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>> AsyncSignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>>(AsyncSignUpRaw(context, request, cq));
+    virtual ::grpc::Status CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::tinychat::CreateGroupReply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::CreateGroupReply>> AsyncCreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::CreateGroupReply>>(AsyncCreateGroupRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>> PrepareAsyncSignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>>(PrepareAsyncSignUpRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::CreateGroupReply>> PrepareAsyncCreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::CreateGroupReply>>(PrepareAsyncCreateGroupRaw(context, request, cq));
     }
-    virtual ::grpc::Status CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::tinychat::Status* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>> AsyncCreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>>(AsyncCreateGroupRaw(context, request, cq));
+    virtual ::grpc::Status QueryUsername(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg& request, ::tinychat::QueryUsernameReply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryUsernameReply>> AsyncQueryUsername(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryUsernameReply>>(AsyncQueryUsernameRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>> PrepareAsyncCreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>>(PrepareAsyncCreateGroupRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryUsernameReply>> PrepareAsyncQueryUsername(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryUsernameReply>>(PrepareAsyncQueryUsernameRaw(context, request, cq));
+    }
+    virtual ::grpc::Status ChangeGroup(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg& request, ::tinychat::ChangeGroupReply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::ChangeGroupReply>> AsyncChangeGroup(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::ChangeGroupReply>>(AsyncChangeGroupRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::ChangeGroupReply>> PrepareAsyncChangeGroup(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::ChangeGroupReply>>(PrepareAsyncChangeGroupRaw(context, request, cq));
+    }
+    virtual ::grpc::Status JoinGroup(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg& request, ::tinychat::JoinGroupReply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::JoinGroupReply>> AsyncJoinGroup(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::JoinGroupReply>>(AsyncJoinGroupRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::JoinGroupReply>> PrepareAsyncJoinGroup(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::JoinGroupReply>>(PrepareAsyncJoinGroupRaw(context, request, cq));
+    }
+    virtual ::grpc::Status QueryHistory(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg& request, ::tinychat::QueryHistoryReply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryHistoryReply>> AsyncQueryHistory(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryHistoryReply>>(AsyncQueryHistoryRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryHistoryReply>> PrepareAsyncQueryHistory(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryHistoryReply>>(PrepareAsyncQueryHistoryRaw(context, request, cq));
     }
     class async_interface {
      public:
       virtual ~async_interface() {}
-      virtual void PostMsg(::grpc::ClientContext* context, const ::tinychat::ChatArg* request, ::tinychat::Status* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void PostMsg(::grpc::ClientContext* context, const ::tinychat::ChatArg* request, ::tinychat::Status* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void Login(::grpc::ClientContext* context, const ::tinychat::LoginArg* request, ::tinychat::Status* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void Login(::grpc::ClientContext* context, const ::tinychat::LoginArg* request, ::tinychat::Status* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg* request, ::tinychat::Status* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg* request, ::tinychat::Status* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::Status* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::Status* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void Login(::grpc::ClientContext* context, const ::tinychat::LoginArg* request, ::tinychat::LoginReply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Login(::grpc::ClientContext* context, const ::tinychat::LoginArg* request, ::tinychat::LoginReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg* request, ::tinychat::SignUpReply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg* request, ::tinychat::SignUpReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::CreateGroupReply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::CreateGroupReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void QueryUsername(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg* request, ::tinychat::QueryUsernameReply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void QueryUsername(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg* request, ::tinychat::QueryUsernameReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void ChangeGroup(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg* request, ::tinychat::ChangeGroupReply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ChangeGroup(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg* request, ::tinychat::ChangeGroupReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void JoinGroup(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg* request, ::tinychat::JoinGroupReply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void JoinGroup(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg* request, ::tinychat::JoinGroupReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void QueryHistory(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg* request, ::tinychat::QueryHistoryReply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void QueryHistory(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg* request, ::tinychat::QueryHistoryReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
     class async_interface* experimental_async() { return async(); }
    private:
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>* AsyncPostMsgRaw(::grpc::ClientContext* context, const ::tinychat::ChatArg& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>* PrepareAsyncPostMsgRaw(::grpc::ClientContext* context, const ::tinychat::ChatArg& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>* AsyncLoginRaw(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>* PrepareAsyncLoginRaw(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>* AsyncSignUpRaw(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>* PrepareAsyncSignUpRaw(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>* AsyncCreateGroupRaw(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::Status>* PrepareAsyncCreateGroupRaw(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::LoginReply>* AsyncLoginRaw(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::LoginReply>* PrepareAsyncLoginRaw(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::SignUpReply>* AsyncSignUpRaw(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::SignUpReply>* PrepareAsyncSignUpRaw(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::CreateGroupReply>* AsyncCreateGroupRaw(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::CreateGroupReply>* PrepareAsyncCreateGroupRaw(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryUsernameReply>* AsyncQueryUsernameRaw(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryUsernameReply>* PrepareAsyncQueryUsernameRaw(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::ChangeGroupReply>* AsyncChangeGroupRaw(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::ChangeGroupReply>* PrepareAsyncChangeGroupRaw(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::JoinGroupReply>* AsyncJoinGroupRaw(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::JoinGroupReply>* PrepareAsyncJoinGroupRaw(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryHistoryReply>* AsyncQueryHistoryRaw(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::tinychat::QueryHistoryReply>* PrepareAsyncQueryHistoryRaw(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
-    ::grpc::Status PostMsg(::grpc::ClientContext* context, const ::tinychat::ChatArg& request, ::tinychat::Status* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>> AsyncPostMsg(::grpc::ClientContext* context, const ::tinychat::ChatArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>>(AsyncPostMsgRaw(context, request, cq));
+    ::grpc::Status Login(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::tinychat::LoginReply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::LoginReply>> AsyncLogin(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::LoginReply>>(AsyncLoginRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>> PrepareAsyncPostMsg(::grpc::ClientContext* context, const ::tinychat::ChatArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>>(PrepareAsyncPostMsgRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::LoginReply>> PrepareAsyncLogin(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::LoginReply>>(PrepareAsyncLoginRaw(context, request, cq));
     }
-    ::grpc::Status Login(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::tinychat::Status* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>> AsyncLogin(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>>(AsyncLoginRaw(context, request, cq));
+    ::grpc::Status SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::tinychat::SignUpReply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::SignUpReply>> AsyncSignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::SignUpReply>>(AsyncSignUpRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>> PrepareAsyncLogin(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>>(PrepareAsyncLoginRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::SignUpReply>> PrepareAsyncSignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::SignUpReply>>(PrepareAsyncSignUpRaw(context, request, cq));
     }
-    ::grpc::Status SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::tinychat::Status* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>> AsyncSignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>>(AsyncSignUpRaw(context, request, cq));
+    ::grpc::Status CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::tinychat::CreateGroupReply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::CreateGroupReply>> AsyncCreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::CreateGroupReply>>(AsyncCreateGroupRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>> PrepareAsyncSignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>>(PrepareAsyncSignUpRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::CreateGroupReply>> PrepareAsyncCreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::CreateGroupReply>>(PrepareAsyncCreateGroupRaw(context, request, cq));
     }
-    ::grpc::Status CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::tinychat::Status* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>> AsyncCreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>>(AsyncCreateGroupRaw(context, request, cq));
+    ::grpc::Status QueryUsername(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg& request, ::tinychat::QueryUsernameReply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::QueryUsernameReply>> AsyncQueryUsername(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::QueryUsernameReply>>(AsyncQueryUsernameRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>> PrepareAsyncCreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::Status>>(PrepareAsyncCreateGroupRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::QueryUsernameReply>> PrepareAsyncQueryUsername(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::QueryUsernameReply>>(PrepareAsyncQueryUsernameRaw(context, request, cq));
+    }
+    ::grpc::Status ChangeGroup(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg& request, ::tinychat::ChangeGroupReply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::ChangeGroupReply>> AsyncChangeGroup(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::ChangeGroupReply>>(AsyncChangeGroupRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::ChangeGroupReply>> PrepareAsyncChangeGroup(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::ChangeGroupReply>>(PrepareAsyncChangeGroupRaw(context, request, cq));
+    }
+    ::grpc::Status JoinGroup(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg& request, ::tinychat::JoinGroupReply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::JoinGroupReply>> AsyncJoinGroup(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::JoinGroupReply>>(AsyncJoinGroupRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::JoinGroupReply>> PrepareAsyncJoinGroup(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::JoinGroupReply>>(PrepareAsyncJoinGroupRaw(context, request, cq));
+    }
+    ::grpc::Status QueryHistory(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg& request, ::tinychat::QueryHistoryReply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::QueryHistoryReply>> AsyncQueryHistory(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::QueryHistoryReply>>(AsyncQueryHistoryRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::QueryHistoryReply>> PrepareAsyncQueryHistory(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::tinychat::QueryHistoryReply>>(PrepareAsyncQueryHistoryRaw(context, request, cq));
     }
     class async final :
       public StubInterface::async_interface {
      public:
-      void PostMsg(::grpc::ClientContext* context, const ::tinychat::ChatArg* request, ::tinychat::Status* response, std::function<void(::grpc::Status)>) override;
-      void PostMsg(::grpc::ClientContext* context, const ::tinychat::ChatArg* request, ::tinychat::Status* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void Login(::grpc::ClientContext* context, const ::tinychat::LoginArg* request, ::tinychat::Status* response, std::function<void(::grpc::Status)>) override;
-      void Login(::grpc::ClientContext* context, const ::tinychat::LoginArg* request, ::tinychat::Status* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg* request, ::tinychat::Status* response, std::function<void(::grpc::Status)>) override;
-      void SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg* request, ::tinychat::Status* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::Status* response, std::function<void(::grpc::Status)>) override;
-      void CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::Status* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void Login(::grpc::ClientContext* context, const ::tinychat::LoginArg* request, ::tinychat::LoginReply* response, std::function<void(::grpc::Status)>) override;
+      void Login(::grpc::ClientContext* context, const ::tinychat::LoginArg* request, ::tinychat::LoginReply* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg* request, ::tinychat::SignUpReply* response, std::function<void(::grpc::Status)>) override;
+      void SignUp(::grpc::ClientContext* context, const ::tinychat::SignUpArg* request, ::tinychat::SignUpReply* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::CreateGroupReply* response, std::function<void(::grpc::Status)>) override;
+      void CreateGroup(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::CreateGroupReply* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void QueryUsername(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg* request, ::tinychat::QueryUsernameReply* response, std::function<void(::grpc::Status)>) override;
+      void QueryUsername(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg* request, ::tinychat::QueryUsernameReply* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void ChangeGroup(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg* request, ::tinychat::ChangeGroupReply* response, std::function<void(::grpc::Status)>) override;
+      void ChangeGroup(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg* request, ::tinychat::ChangeGroupReply* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void JoinGroup(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg* request, ::tinychat::JoinGroupReply* response, std::function<void(::grpc::Status)>) override;
+      void JoinGroup(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg* request, ::tinychat::JoinGroupReply* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void QueryHistory(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg* request, ::tinychat::QueryHistoryReply* response, std::function<void(::grpc::Status)>) override;
+      void QueryHistory(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg* request, ::tinychat::QueryHistoryReply* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -141,18 +201,27 @@ class Chat final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class async async_stub_{this};
-    ::grpc::ClientAsyncResponseReader< ::tinychat::Status>* AsyncPostMsgRaw(::grpc::ClientContext* context, const ::tinychat::ChatArg& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::tinychat::Status>* PrepareAsyncPostMsgRaw(::grpc::ClientContext* context, const ::tinychat::ChatArg& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::tinychat::Status>* AsyncLoginRaw(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::tinychat::Status>* PrepareAsyncLoginRaw(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::tinychat::Status>* AsyncSignUpRaw(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::tinychat::Status>* PrepareAsyncSignUpRaw(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::tinychat::Status>* AsyncCreateGroupRaw(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::tinychat::Status>* PrepareAsyncCreateGroupRaw(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) override;
-    const ::grpc::internal::RpcMethod rpcmethod_PostMsg_;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::LoginReply>* AsyncLoginRaw(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::LoginReply>* PrepareAsyncLoginRaw(::grpc::ClientContext* context, const ::tinychat::LoginArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::SignUpReply>* AsyncSignUpRaw(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::SignUpReply>* PrepareAsyncSignUpRaw(::grpc::ClientContext* context, const ::tinychat::SignUpArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::CreateGroupReply>* AsyncCreateGroupRaw(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::CreateGroupReply>* PrepareAsyncCreateGroupRaw(::grpc::ClientContext* context, const ::tinychat::CreateGroupArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::QueryUsernameReply>* AsyncQueryUsernameRaw(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::QueryUsernameReply>* PrepareAsyncQueryUsernameRaw(::grpc::ClientContext* context, const ::tinychat::QueryUsernameArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::ChangeGroupReply>* AsyncChangeGroupRaw(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::ChangeGroupReply>* PrepareAsyncChangeGroupRaw(::grpc::ClientContext* context, const ::tinychat::ChangeGroupArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::JoinGroupReply>* AsyncJoinGroupRaw(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::JoinGroupReply>* PrepareAsyncJoinGroupRaw(::grpc::ClientContext* context, const ::tinychat::JoinGroupArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::QueryHistoryReply>* AsyncQueryHistoryRaw(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::tinychat::QueryHistoryReply>* PrepareAsyncQueryHistoryRaw(::grpc::ClientContext* context, const ::tinychat::QueryHistoryArg& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_Login_;
     const ::grpc::internal::RpcMethod rpcmethod_SignUp_;
     const ::grpc::internal::RpcMethod rpcmethod_CreateGroup_;
+    const ::grpc::internal::RpcMethod rpcmethod_QueryUsername_;
+    const ::grpc::internal::RpcMethod rpcmethod_ChangeGroup_;
+    const ::grpc::internal::RpcMethod rpcmethod_JoinGroup_;
+    const ::grpc::internal::RpcMethod rpcmethod_QueryHistory_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -160,30 +229,13 @@ class Chat final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status PostMsg(::grpc::ServerContext* context, const ::tinychat::ChatArg* request, ::tinychat::Status* response);
-    virtual ::grpc::Status Login(::grpc::ServerContext* context, const ::tinychat::LoginArg* request, ::tinychat::Status* response);
-    virtual ::grpc::Status SignUp(::grpc::ServerContext* context, const ::tinychat::SignUpArg* request, ::tinychat::Status* response);
-    virtual ::grpc::Status CreateGroup(::grpc::ServerContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::Status* response);
-  };
-  template <class BaseClass>
-  class WithAsyncMethod_PostMsg : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_PostMsg() {
-      ::grpc::Service::MarkMethodAsync(0);
-    }
-    ~WithAsyncMethod_PostMsg() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status PostMsg(::grpc::ServerContext* /*context*/, const ::tinychat::ChatArg* /*request*/, ::tinychat::Status* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestPostMsg(::grpc::ServerContext* context, ::tinychat::ChatArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::Status>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
-    }
+    virtual ::grpc::Status Login(::grpc::ServerContext* context, const ::tinychat::LoginArg* request, ::tinychat::LoginReply* response);
+    virtual ::grpc::Status SignUp(::grpc::ServerContext* context, const ::tinychat::SignUpArg* request, ::tinychat::SignUpReply* response);
+    virtual ::grpc::Status CreateGroup(::grpc::ServerContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::CreateGroupReply* response);
+    virtual ::grpc::Status QueryUsername(::grpc::ServerContext* context, const ::tinychat::QueryUsernameArg* request, ::tinychat::QueryUsernameReply* response);
+    virtual ::grpc::Status ChangeGroup(::grpc::ServerContext* context, const ::tinychat::ChangeGroupArg* request, ::tinychat::ChangeGroupReply* response);
+    virtual ::grpc::Status JoinGroup(::grpc::ServerContext* context, const ::tinychat::JoinGroupArg* request, ::tinychat::JoinGroupReply* response);
+    virtual ::grpc::Status QueryHistory(::grpc::ServerContext* context, const ::tinychat::QueryHistoryArg* request, ::tinychat::QueryHistoryReply* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_Login : public BaseClass {
@@ -191,18 +243,18 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_Login() {
-      ::grpc::Service::MarkMethodAsync(1);
+      ::grpc::Service::MarkMethodAsync(0);
     }
     ~WithAsyncMethod_Login() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::LoginReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestLogin(::grpc::ServerContext* context, ::tinychat::LoginArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::Status>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    void RequestLogin(::grpc::ServerContext* context, ::tinychat::LoginArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::LoginReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -211,18 +263,18 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_SignUp() {
-      ::grpc::Service::MarkMethodAsync(2);
+      ::grpc::Service::MarkMethodAsync(1);
     }
     ~WithAsyncMethod_SignUp() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::SignUpReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestSignUp(::grpc::ServerContext* context, ::tinychat::SignUpArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::Status>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    void RequestSignUp(::grpc::ServerContext* context, ::tinychat::SignUpArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::SignUpReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -231,74 +283,127 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_CreateGroup() {
-      ::grpc::Service::MarkMethodAsync(3);
+      ::grpc::Service::MarkMethodAsync(2);
     }
     ~WithAsyncMethod_CreateGroup() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::CreateGroupReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestCreateGroup(::grpc::ServerContext* context, ::tinychat::CreateGroupArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::Status>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    void RequestCreateGroup(::grpc::ServerContext* context, ::tinychat::CreateGroupArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::CreateGroupReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_PostMsg<WithAsyncMethod_Login<WithAsyncMethod_SignUp<WithAsyncMethod_CreateGroup<Service > > > > AsyncService;
   template <class BaseClass>
-  class WithCallbackMethod_PostMsg : public BaseClass {
+  class WithAsyncMethod_QueryUsername : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithCallbackMethod_PostMsg() {
-      ::grpc::Service::MarkMethodCallback(0,
-          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::ChatArg, ::tinychat::Status>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::tinychat::ChatArg* request, ::tinychat::Status* response) { return this->PostMsg(context, request, response); }));}
-    void SetMessageAllocatorFor_PostMsg(
-        ::grpc::MessageAllocator< ::tinychat::ChatArg, ::tinychat::Status>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(0);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::ChatArg, ::tinychat::Status>*>(handler)
-              ->SetMessageAllocator(allocator);
+    WithAsyncMethod_QueryUsername() {
+      ::grpc::Service::MarkMethodAsync(3);
     }
-    ~WithCallbackMethod_PostMsg() override {
+    ~WithAsyncMethod_QueryUsername() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status PostMsg(::grpc::ServerContext* /*context*/, const ::tinychat::ChatArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status QueryUsername(::grpc::ServerContext* /*context*/, const ::tinychat::QueryUsernameArg* /*request*/, ::tinychat::QueryUsernameReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerUnaryReactor* PostMsg(
-      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::ChatArg* /*request*/, ::tinychat::Status* /*response*/)  { return nullptr; }
+    void RequestQueryUsername(::grpc::ServerContext* context, ::tinychat::QueryUsernameArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::QueryUsernameReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    }
   };
+  template <class BaseClass>
+  class WithAsyncMethod_ChangeGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_ChangeGroup() {
+      ::grpc::Service::MarkMethodAsync(4);
+    }
+    ~WithAsyncMethod_ChangeGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ChangeGroup(::grpc::ServerContext* /*context*/, const ::tinychat::ChangeGroupArg* /*request*/, ::tinychat::ChangeGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestChangeGroup(::grpc::ServerContext* context, ::tinychat::ChangeGroupArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::ChangeGroupReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_JoinGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_JoinGroup() {
+      ::grpc::Service::MarkMethodAsync(5);
+    }
+    ~WithAsyncMethod_JoinGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status JoinGroup(::grpc::ServerContext* /*context*/, const ::tinychat::JoinGroupArg* /*request*/, ::tinychat::JoinGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestJoinGroup(::grpc::ServerContext* context, ::tinychat::JoinGroupArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::JoinGroupReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_QueryHistory : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_QueryHistory() {
+      ::grpc::Service::MarkMethodAsync(6);
+    }
+    ~WithAsyncMethod_QueryHistory() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryHistory(::grpc::ServerContext* /*context*/, const ::tinychat::QueryHistoryArg* /*request*/, ::tinychat::QueryHistoryReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestQueryHistory(::grpc::ServerContext* context, ::tinychat::QueryHistoryArg* request, ::grpc::ServerAsyncResponseWriter< ::tinychat::QueryHistoryReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_Login<WithAsyncMethod_SignUp<WithAsyncMethod_CreateGroup<WithAsyncMethod_QueryUsername<WithAsyncMethod_ChangeGroup<WithAsyncMethod_JoinGroup<WithAsyncMethod_QueryHistory<Service > > > > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_Login : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_Login() {
-      ::grpc::Service::MarkMethodCallback(1,
-          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::LoginArg, ::tinychat::Status>(
+      ::grpc::Service::MarkMethodCallback(0,
+          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::LoginArg, ::tinychat::LoginReply>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::tinychat::LoginArg* request, ::tinychat::Status* response) { return this->Login(context, request, response); }));}
+                   ::grpc::CallbackServerContext* context, const ::tinychat::LoginArg* request, ::tinychat::LoginReply* response) { return this->Login(context, request, response); }));}
     void SetMessageAllocatorFor_Login(
-        ::grpc::MessageAllocator< ::tinychat::LoginArg, ::tinychat::Status>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::LoginArg, ::tinychat::Status>*>(handler)
+        ::grpc::MessageAllocator< ::tinychat::LoginArg, ::tinychat::LoginReply>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(0);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::LoginArg, ::tinychat::LoginReply>*>(handler)
               ->SetMessageAllocator(allocator);
     }
     ~WithCallbackMethod_Login() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::LoginReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* Login(
-      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::Status* /*response*/)  { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::LoginReply* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
   class WithCallbackMethod_SignUp : public BaseClass {
@@ -306,26 +411,26 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_SignUp() {
-      ::grpc::Service::MarkMethodCallback(2,
-          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::SignUpArg, ::tinychat::Status>(
+      ::grpc::Service::MarkMethodCallback(1,
+          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::SignUpArg, ::tinychat::SignUpReply>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::tinychat::SignUpArg* request, ::tinychat::Status* response) { return this->SignUp(context, request, response); }));}
+                   ::grpc::CallbackServerContext* context, const ::tinychat::SignUpArg* request, ::tinychat::SignUpReply* response) { return this->SignUp(context, request, response); }));}
     void SetMessageAllocatorFor_SignUp(
-        ::grpc::MessageAllocator< ::tinychat::SignUpArg, ::tinychat::Status>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::SignUpArg, ::tinychat::Status>*>(handler)
+        ::grpc::MessageAllocator< ::tinychat::SignUpArg, ::tinychat::SignUpReply>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::SignUpArg, ::tinychat::SignUpReply>*>(handler)
               ->SetMessageAllocator(allocator);
     }
     ~WithCallbackMethod_SignUp() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::SignUpReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* SignUp(
-      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::Status* /*response*/)  { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::SignUpReply* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
   class WithCallbackMethod_CreateGroup : public BaseClass {
@@ -333,59 +438,150 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_CreateGroup() {
-      ::grpc::Service::MarkMethodCallback(3,
-          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::CreateGroupArg, ::tinychat::Status>(
+      ::grpc::Service::MarkMethodCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::CreateGroupArg, ::tinychat::CreateGroupReply>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::Status* response) { return this->CreateGroup(context, request, response); }));}
+                   ::grpc::CallbackServerContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::CreateGroupReply* response) { return this->CreateGroup(context, request, response); }));}
     void SetMessageAllocatorFor_CreateGroup(
-        ::grpc::MessageAllocator< ::tinychat::CreateGroupArg, ::tinychat::Status>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::CreateGroupArg, ::tinychat::Status>*>(handler)
+        ::grpc::MessageAllocator< ::tinychat::CreateGroupArg, ::tinychat::CreateGroupReply>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::CreateGroupArg, ::tinychat::CreateGroupReply>*>(handler)
               ->SetMessageAllocator(allocator);
     }
     ~WithCallbackMethod_CreateGroup() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::CreateGroupReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* CreateGroup(
-      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::Status* /*response*/)  { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::CreateGroupReply* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_PostMsg<WithCallbackMethod_Login<WithCallbackMethod_SignUp<WithCallbackMethod_CreateGroup<Service > > > > CallbackService;
-  typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
-  class WithGenericMethod_PostMsg : public BaseClass {
+  class WithCallbackMethod_QueryUsername : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithGenericMethod_PostMsg() {
-      ::grpc::Service::MarkMethodGeneric(0);
+    WithCallbackMethod_QueryUsername() {
+      ::grpc::Service::MarkMethodCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::QueryUsernameArg, ::tinychat::QueryUsernameReply>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::tinychat::QueryUsernameArg* request, ::tinychat::QueryUsernameReply* response) { return this->QueryUsername(context, request, response); }));}
+    void SetMessageAllocatorFor_QueryUsername(
+        ::grpc::MessageAllocator< ::tinychat::QueryUsernameArg, ::tinychat::QueryUsernameReply>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::QueryUsernameArg, ::tinychat::QueryUsernameReply>*>(handler)
+              ->SetMessageAllocator(allocator);
     }
-    ~WithGenericMethod_PostMsg() override {
+    ~WithCallbackMethod_QueryUsername() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status PostMsg(::grpc::ServerContext* /*context*/, const ::tinychat::ChatArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status QueryUsername(::grpc::ServerContext* /*context*/, const ::tinychat::QueryUsernameArg* /*request*/, ::tinychat::QueryUsernameReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
+    virtual ::grpc::ServerUnaryReactor* QueryUsername(
+      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::QueryUsernameArg* /*request*/, ::tinychat::QueryUsernameReply* /*response*/)  { return nullptr; }
   };
+  template <class BaseClass>
+  class WithCallbackMethod_ChangeGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_ChangeGroup() {
+      ::grpc::Service::MarkMethodCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::ChangeGroupArg, ::tinychat::ChangeGroupReply>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::tinychat::ChangeGroupArg* request, ::tinychat::ChangeGroupReply* response) { return this->ChangeGroup(context, request, response); }));}
+    void SetMessageAllocatorFor_ChangeGroup(
+        ::grpc::MessageAllocator< ::tinychat::ChangeGroupArg, ::tinychat::ChangeGroupReply>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(4);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::ChangeGroupArg, ::tinychat::ChangeGroupReply>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_ChangeGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ChangeGroup(::grpc::ServerContext* /*context*/, const ::tinychat::ChangeGroupArg* /*request*/, ::tinychat::ChangeGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* ChangeGroup(
+      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::ChangeGroupArg* /*request*/, ::tinychat::ChangeGroupReply* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_JoinGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_JoinGroup() {
+      ::grpc::Service::MarkMethodCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::JoinGroupArg, ::tinychat::JoinGroupReply>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::tinychat::JoinGroupArg* request, ::tinychat::JoinGroupReply* response) { return this->JoinGroup(context, request, response); }));}
+    void SetMessageAllocatorFor_JoinGroup(
+        ::grpc::MessageAllocator< ::tinychat::JoinGroupArg, ::tinychat::JoinGroupReply>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(5);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::JoinGroupArg, ::tinychat::JoinGroupReply>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_JoinGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status JoinGroup(::grpc::ServerContext* /*context*/, const ::tinychat::JoinGroupArg* /*request*/, ::tinychat::JoinGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* JoinGroup(
+      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::JoinGroupArg* /*request*/, ::tinychat::JoinGroupReply* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_QueryHistory : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_QueryHistory() {
+      ::grpc::Service::MarkMethodCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::tinychat::QueryHistoryArg, ::tinychat::QueryHistoryReply>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::tinychat::QueryHistoryArg* request, ::tinychat::QueryHistoryReply* response) { return this->QueryHistory(context, request, response); }));}
+    void SetMessageAllocatorFor_QueryHistory(
+        ::grpc::MessageAllocator< ::tinychat::QueryHistoryArg, ::tinychat::QueryHistoryReply>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(6);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::tinychat::QueryHistoryArg, ::tinychat::QueryHistoryReply>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_QueryHistory() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryHistory(::grpc::ServerContext* /*context*/, const ::tinychat::QueryHistoryArg* /*request*/, ::tinychat::QueryHistoryReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* QueryHistory(
+      ::grpc::CallbackServerContext* /*context*/, const ::tinychat::QueryHistoryArg* /*request*/, ::tinychat::QueryHistoryReply* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_Login<WithCallbackMethod_SignUp<WithCallbackMethod_CreateGroup<WithCallbackMethod_QueryUsername<WithCallbackMethod_ChangeGroup<WithCallbackMethod_JoinGroup<WithCallbackMethod_QueryHistory<Service > > > > > > > CallbackService;
+  typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Login : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_Login() {
-      ::grpc::Service::MarkMethodGeneric(1);
+      ::grpc::Service::MarkMethodGeneric(0);
     }
     ~WithGenericMethod_Login() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::LoginReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -396,13 +592,13 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_SignUp() {
-      ::grpc::Service::MarkMethodGeneric(2);
+      ::grpc::Service::MarkMethodGeneric(1);
     }
     ~WithGenericMethod_SignUp() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::SignUpReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -413,35 +609,83 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_CreateGroup() {
-      ::grpc::Service::MarkMethodGeneric(3);
+      ::grpc::Service::MarkMethodGeneric(2);
     }
     ~WithGenericMethod_CreateGroup() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::CreateGroupReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
   };
   template <class BaseClass>
-  class WithRawMethod_PostMsg : public BaseClass {
+  class WithGenericMethod_QueryUsername : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawMethod_PostMsg() {
-      ::grpc::Service::MarkMethodRaw(0);
+    WithGenericMethod_QueryUsername() {
+      ::grpc::Service::MarkMethodGeneric(3);
     }
-    ~WithRawMethod_PostMsg() override {
+    ~WithGenericMethod_QueryUsername() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status PostMsg(::grpc::ServerContext* /*context*/, const ::tinychat::ChatArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status QueryUsername(::grpc::ServerContext* /*context*/, const ::tinychat::QueryUsernameArg* /*request*/, ::tinychat::QueryUsernameReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestPostMsg(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
+  };
+  template <class BaseClass>
+  class WithGenericMethod_ChangeGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_ChangeGroup() {
+      ::grpc::Service::MarkMethodGeneric(4);
+    }
+    ~WithGenericMethod_ChangeGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ChangeGroup(::grpc::ServerContext* /*context*/, const ::tinychat::ChangeGroupArg* /*request*/, ::tinychat::ChangeGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_JoinGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_JoinGroup() {
+      ::grpc::Service::MarkMethodGeneric(5);
+    }
+    ~WithGenericMethod_JoinGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status JoinGroup(::grpc::ServerContext* /*context*/, const ::tinychat::JoinGroupArg* /*request*/, ::tinychat::JoinGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_QueryHistory : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_QueryHistory() {
+      ::grpc::Service::MarkMethodGeneric(6);
+    }
+    ~WithGenericMethod_QueryHistory() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryHistory(::grpc::ServerContext* /*context*/, const ::tinychat::QueryHistoryArg* /*request*/, ::tinychat::QueryHistoryReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
   };
   template <class BaseClass>
@@ -450,18 +694,18 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_Login() {
-      ::grpc::Service::MarkMethodRaw(1);
+      ::grpc::Service::MarkMethodRaw(0);
     }
     ~WithRawMethod_Login() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::LoginReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestLogin(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -470,18 +714,18 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_SignUp() {
-      ::grpc::Service::MarkMethodRaw(2);
+      ::grpc::Service::MarkMethodRaw(1);
     }
     ~WithRawMethod_SignUp() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::SignUpReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestSignUp(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -490,41 +734,99 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_CreateGroup() {
-      ::grpc::Service::MarkMethodRaw(3);
+      ::grpc::Service::MarkMethodRaw(2);
     }
     ~WithRawMethod_CreateGroup() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::CreateGroupReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestCreateGroup(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_QueryUsername : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_QueryUsername() {
+      ::grpc::Service::MarkMethodRaw(3);
+    }
+    ~WithRawMethod_QueryUsername() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryUsername(::grpc::ServerContext* /*context*/, const ::tinychat::QueryUsernameArg* /*request*/, ::tinychat::QueryUsernameReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestQueryUsername(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
-  class WithRawCallbackMethod_PostMsg : public BaseClass {
+  class WithRawMethod_ChangeGroup : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawCallbackMethod_PostMsg() {
-      ::grpc::Service::MarkMethodRawCallback(0,
-          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->PostMsg(context, request, response); }));
+    WithRawMethod_ChangeGroup() {
+      ::grpc::Service::MarkMethodRaw(4);
     }
-    ~WithRawCallbackMethod_PostMsg() override {
+    ~WithRawMethod_ChangeGroup() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status PostMsg(::grpc::ServerContext* /*context*/, const ::tinychat::ChatArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status ChangeGroup(::grpc::ServerContext* /*context*/, const ::tinychat::ChangeGroupArg* /*request*/, ::tinychat::ChangeGroupReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerUnaryReactor* PostMsg(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+    void RequestChangeGroup(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_JoinGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_JoinGroup() {
+      ::grpc::Service::MarkMethodRaw(5);
+    }
+    ~WithRawMethod_JoinGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status JoinGroup(::grpc::ServerContext* /*context*/, const ::tinychat::JoinGroupArg* /*request*/, ::tinychat::JoinGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestJoinGroup(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_QueryHistory : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_QueryHistory() {
+      ::grpc::Service::MarkMethodRaw(6);
+    }
+    ~WithRawMethod_QueryHistory() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryHistory(::grpc::ServerContext* /*context*/, const ::tinychat::QueryHistoryArg* /*request*/, ::tinychat::QueryHistoryReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestQueryHistory(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+    }
   };
   template <class BaseClass>
   class WithRawCallbackMethod_Login : public BaseClass {
@@ -532,7 +834,7 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_Login() {
-      ::grpc::Service::MarkMethodRawCallback(1,
+      ::grpc::Service::MarkMethodRawCallback(0,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Login(context, request, response); }));
@@ -541,7 +843,7 @@ class Chat final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::LoginReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -554,7 +856,7 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_SignUp() {
-      ::grpc::Service::MarkMethodRawCallback(2,
+      ::grpc::Service::MarkMethodRawCallback(1,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->SignUp(context, request, response); }));
@@ -563,7 +865,7 @@ class Chat final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::SignUpReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -576,7 +878,7 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_CreateGroup() {
-      ::grpc::Service::MarkMethodRawCallback(3,
+      ::grpc::Service::MarkMethodRawCallback(2,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->CreateGroup(context, request, response); }));
@@ -585,7 +887,7 @@ class Chat final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::CreateGroupReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -593,31 +895,92 @@ class Chat final {
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class WithStreamedUnaryMethod_PostMsg : public BaseClass {
+  class WithRawCallbackMethod_QueryUsername : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithStreamedUnaryMethod_PostMsg() {
-      ::grpc::Service::MarkMethodStreamed(0,
-        new ::grpc::internal::StreamedUnaryHandler<
-          ::tinychat::ChatArg, ::tinychat::Status>(
-            [this](::grpc::ServerContext* context,
-                   ::grpc::ServerUnaryStreamer<
-                     ::tinychat::ChatArg, ::tinychat::Status>* streamer) {
-                       return this->StreamedPostMsg(context,
-                         streamer);
-                  }));
+    WithRawCallbackMethod_QueryUsername() {
+      ::grpc::Service::MarkMethodRawCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->QueryUsername(context, request, response); }));
     }
-    ~WithStreamedUnaryMethod_PostMsg() override {
+    ~WithRawCallbackMethod_QueryUsername() override {
       BaseClassMustBeDerivedFromService(this);
     }
-    // disable regular version of this method
-    ::grpc::Status PostMsg(::grpc::ServerContext* /*context*/, const ::tinychat::ChatArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    // disable synchronous version of this method
+    ::grpc::Status QueryUsername(::grpc::ServerContext* /*context*/, const ::tinychat::QueryUsernameArg* /*request*/, ::tinychat::QueryUsernameReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedPostMsg(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::ChatArg,::tinychat::Status>* server_unary_streamer) = 0;
+    virtual ::grpc::ServerUnaryReactor* QueryUsername(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_ChangeGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_ChangeGroup() {
+      ::grpc::Service::MarkMethodRawCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->ChangeGroup(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_ChangeGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ChangeGroup(::grpc::ServerContext* /*context*/, const ::tinychat::ChangeGroupArg* /*request*/, ::tinychat::ChangeGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* ChangeGroup(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_JoinGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_JoinGroup() {
+      ::grpc::Service::MarkMethodRawCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->JoinGroup(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_JoinGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status JoinGroup(::grpc::ServerContext* /*context*/, const ::tinychat::JoinGroupArg* /*request*/, ::tinychat::JoinGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* JoinGroup(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_QueryHistory : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_QueryHistory() {
+      ::grpc::Service::MarkMethodRawCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->QueryHistory(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_QueryHistory() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryHistory(::grpc::ServerContext* /*context*/, const ::tinychat::QueryHistoryArg* /*request*/, ::tinychat::QueryHistoryReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* QueryHistory(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_Login : public BaseClass {
@@ -625,12 +988,12 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_Login() {
-      ::grpc::Service::MarkMethodStreamed(1,
+      ::grpc::Service::MarkMethodStreamed(0,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::tinychat::LoginArg, ::tinychat::Status>(
+          ::tinychat::LoginArg, ::tinychat::LoginReply>(
             [this](::grpc::ServerContext* context,
                    ::grpc::ServerUnaryStreamer<
-                     ::tinychat::LoginArg, ::tinychat::Status>* streamer) {
+                     ::tinychat::LoginArg, ::tinychat::LoginReply>* streamer) {
                        return this->StreamedLogin(context,
                          streamer);
                   }));
@@ -639,12 +1002,12 @@ class Chat final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::tinychat::LoginArg* /*request*/, ::tinychat::LoginReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedLogin(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::LoginArg,::tinychat::Status>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedLogin(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::LoginArg,::tinychat::LoginReply>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_SignUp : public BaseClass {
@@ -652,12 +1015,12 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_SignUp() {
-      ::grpc::Service::MarkMethodStreamed(2,
+      ::grpc::Service::MarkMethodStreamed(1,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::tinychat::SignUpArg, ::tinychat::Status>(
+          ::tinychat::SignUpArg, ::tinychat::SignUpReply>(
             [this](::grpc::ServerContext* context,
                    ::grpc::ServerUnaryStreamer<
-                     ::tinychat::SignUpArg, ::tinychat::Status>* streamer) {
+                     ::tinychat::SignUpArg, ::tinychat::SignUpReply>* streamer) {
                        return this->StreamedSignUp(context,
                          streamer);
                   }));
@@ -666,12 +1029,12 @@ class Chat final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status SignUp(::grpc::ServerContext* /*context*/, const ::tinychat::SignUpArg* /*request*/, ::tinychat::SignUpReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedSignUp(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::SignUpArg,::tinychat::Status>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedSignUp(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::SignUpArg,::tinychat::SignUpReply>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_CreateGroup : public BaseClass {
@@ -679,12 +1042,12 @@ class Chat final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_CreateGroup() {
-      ::grpc::Service::MarkMethodStreamed(3,
+      ::grpc::Service::MarkMethodStreamed(2,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::tinychat::CreateGroupArg, ::tinychat::Status>(
+          ::tinychat::CreateGroupArg, ::tinychat::CreateGroupReply>(
             [this](::grpc::ServerContext* context,
                    ::grpc::ServerUnaryStreamer<
-                     ::tinychat::CreateGroupArg, ::tinychat::Status>* streamer) {
+                     ::tinychat::CreateGroupArg, ::tinychat::CreateGroupReply>* streamer) {
                        return this->StreamedCreateGroup(context,
                          streamer);
                   }));
@@ -693,16 +1056,124 @@ class Chat final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::Status* /*response*/) override {
+    ::grpc::Status CreateGroup(::grpc::ServerContext* /*context*/, const ::tinychat::CreateGroupArg* /*request*/, ::tinychat::CreateGroupReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedCreateGroup(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::CreateGroupArg,::tinychat::Status>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedCreateGroup(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::CreateGroupArg,::tinychat::CreateGroupReply>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_PostMsg<WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_SignUp<WithStreamedUnaryMethod_CreateGroup<Service > > > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_QueryUsername : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_QueryUsername() {
+      ::grpc::Service::MarkMethodStreamed(3,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::tinychat::QueryUsernameArg, ::tinychat::QueryUsernameReply>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::tinychat::QueryUsernameArg, ::tinychat::QueryUsernameReply>* streamer) {
+                       return this->StreamedQueryUsername(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_QueryUsername() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status QueryUsername(::grpc::ServerContext* /*context*/, const ::tinychat::QueryUsernameArg* /*request*/, ::tinychat::QueryUsernameReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedQueryUsername(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::QueryUsernameArg,::tinychat::QueryUsernameReply>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_ChangeGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_ChangeGroup() {
+      ::grpc::Service::MarkMethodStreamed(4,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::tinychat::ChangeGroupArg, ::tinychat::ChangeGroupReply>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::tinychat::ChangeGroupArg, ::tinychat::ChangeGroupReply>* streamer) {
+                       return this->StreamedChangeGroup(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_ChangeGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status ChangeGroup(::grpc::ServerContext* /*context*/, const ::tinychat::ChangeGroupArg* /*request*/, ::tinychat::ChangeGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedChangeGroup(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::ChangeGroupArg,::tinychat::ChangeGroupReply>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_JoinGroup : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_JoinGroup() {
+      ::grpc::Service::MarkMethodStreamed(5,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::tinychat::JoinGroupArg, ::tinychat::JoinGroupReply>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::tinychat::JoinGroupArg, ::tinychat::JoinGroupReply>* streamer) {
+                       return this->StreamedJoinGroup(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_JoinGroup() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status JoinGroup(::grpc::ServerContext* /*context*/, const ::tinychat::JoinGroupArg* /*request*/, ::tinychat::JoinGroupReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedJoinGroup(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::JoinGroupArg,::tinychat::JoinGroupReply>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_QueryHistory : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_QueryHistory() {
+      ::grpc::Service::MarkMethodStreamed(6,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::tinychat::QueryHistoryArg, ::tinychat::QueryHistoryReply>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::tinychat::QueryHistoryArg, ::tinychat::QueryHistoryReply>* streamer) {
+                       return this->StreamedQueryHistory(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_QueryHistory() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status QueryHistory(::grpc::ServerContext* /*context*/, const ::tinychat::QueryHistoryArg* /*request*/, ::tinychat::QueryHistoryReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedQueryHistory(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::tinychat::QueryHistoryArg,::tinychat::QueryHistoryReply>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_SignUp<WithStreamedUnaryMethod_CreateGroup<WithStreamedUnaryMethod_QueryUsername<WithStreamedUnaryMethod_ChangeGroup<WithStreamedUnaryMethod_JoinGroup<WithStreamedUnaryMethod_QueryHistory<Service > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_PostMsg<WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_SignUp<WithStreamedUnaryMethod_CreateGroup<Service > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_SignUp<WithStreamedUnaryMethod_CreateGroup<WithStreamedUnaryMethod_QueryUsername<WithStreamedUnaryMethod_ChangeGroup<WithStreamedUnaryMethod_JoinGroup<WithStreamedUnaryMethod_QueryHistory<Service > > > > > > > StreamedService;
 };
 
 }  // namespace tinychat

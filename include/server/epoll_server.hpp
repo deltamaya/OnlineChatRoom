@@ -3,6 +3,7 @@
 #include "epoller.hpp"
 #include "sock.hpp"
 #include <unordered_map>
+#include <grpc++/grpc++.h>
 #include "connection.hpp"
 #include "thread_pool.hh"
 #include <functional>
@@ -12,7 +13,6 @@
 #include <unordered_set>
 namespace tinychat{
     constexpr uint16_t default_port = 55369;
-    
     
     class EpollServer
     {
@@ -26,15 +26,17 @@ namespace tinychat{
         Epoller epoller_; // epoll
         
         std::unordered_map<int, std::unordered_set<int>> gid_to_users_;
+
         EpollServer() : lsnfd(socket(AF_INET, SOCK_STREAM, 0))
         {
             // log_debug("lsnfd: {}",lsnfd);
+
         }
         ~EpollServer()
         {
             // lsnsock_.cl();
         }
-        
+
         void boot()
         {
             auto lsnsock = std::make_unique<tinychat::Sock>(lsnfd, default_port);
@@ -107,6 +109,8 @@ namespace tinychat{
                 fcntl(conn->client_->fd(), F_SETFD, F_GETFL | O_NONBLOCK);
             epoller_.add_event(conn->client_->fd(), event);
             conns_.emplace(conn->client_->fd(), std::move(conn));
+            conn->outbuf_=std::to_string(conn->client_->fd());
+            sender(conn);
         }
         
         // listen socket's reader, register a client's connection to epoller and conns
@@ -120,6 +124,7 @@ namespace tinychat{
                                               std::bind(&EpollServer::excepter, this, std::placeholders::_1));
                 add_conn(std::move(clientconn), EPOLLIN | EPOLLET);
             } while (conn->event_ & EPOLLET);
+            
         }
         
         // aka reader, read bytes from a connection's buffer and parse it into a response if possible
@@ -136,50 +141,9 @@ namespace tinychat{
                     // buf[n-1]=0;buf[n-2]=0;
                     conn->inbuf_ += buf;
                     // log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, connect->inbuf_.size());
-                    
-                    Request request;
-                    bool ok = Request::parse_request(conn->inbuf_, &request);
-                    Response ret;
-                    // log_debug("parsing");
-                    if (ok)
-                    {
-                        log_debug("parse ok");
-                        // log_debug("parsed request: {}", request.serialize());
-                        epoller_.rwcfg(conn, true, true);
-                        switch (request.service_)
-                        {
-                            case ServiceCode::postmsg:
-                                handle_postmsg(conn, request);
-                                break;
-                            case ServiceCode::login:
-                                handle_login(conn, request);
-                                break;
-                            case ServiceCode::signup:
-                                handle_signup(conn, request);
-                                break;
-                            case ServiceCode::query_uname:
-                                handle_query_username(conn, request);
-                                break;
-                            case ServiceCode::query_history:
-                                handle_query_history(conn, request);
-                                break;
-                            case ServiceCode::cd:
-                                handle_cd(conn, request);
-                                break;
-                            case ServiceCode::create_group:
-                                handle_create_group(conn, request);
-                                break;
-                            case ServiceCode::join:
-                                handle_join(conn,request);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        log_debug("parse not ok");
-                    }
+                    tinychat::Chat incomingMsg;
+                    incomingMsg.ParseFromString(conn->inbuf_);
+                    handle_postmsg(conn,incomingMsg);
                 }
                 else
                 {
