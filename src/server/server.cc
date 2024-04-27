@@ -19,6 +19,6 @@ int main()
     signal(SIGCHLD, SIG_IGN);
     // sigignore(SIGCHLD);
     std::string server_address("0.0.0.0:50051");
-    auto rpcServer=tinychat::RunRpcServer();
+    auto epc=std::thread([=]{tinychat::RunRpcServer(server_address);});
     tinychat::server.boot();
 }

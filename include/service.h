@@ -17,5 +17,5 @@ namespace tinychat{
     void handle_cd(std::unique_ptr<tinychat::Connection>&, const Request &r);
     void handle_create_group(std::unique_ptr<tinychat::Connection>&conn,const Request & r);
     void handle_join(std::unique_ptr<tinychat::Connection> &conn, const Request &r);
-    std::unique_ptr<grpc::Server> RunRpcServer();
+    void RunRpcServer(std::string);
 }

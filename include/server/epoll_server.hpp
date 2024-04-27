@@ -109,8 +109,7 @@ namespace tinychat{
                 fcntl(conn->client_->fd(), F_SETFD, F_GETFL | O_NONBLOCK);
             epoller_.add_event(conn->client_->fd(), event);
             conns_.emplace(conn->client_->fd(), std::move(conn));
-            conn->outbuf_=std::to_string(conn->client_->fd());
-            sender(conn);
+
         }
         
         // listen socket's reader, register a client's connection to epoller and conns
@@ -122,7 +121,11 @@ namespace tinychat{
                 clientconn->register_callback(std::bind(&EpollServer::receiver, this, std::placeholders::_1),
                                               std::bind(&EpollServer::sender, this, std::placeholders::_1),
                                               std::bind(&EpollServer::excepter, this, std::placeholders::_1));
+                auto cfd=clientconn->client_->fd();
                 add_conn(std::move(clientconn), EPOLLIN | EPOLLET);
+                auto& tempConn=conns_[cfd];
+                tempConn->outbuf_=std::to_string(tempConn->client_->fd());
+                sender(tempConn);
             } while (conn->event_ & EPOLLET);
             
         }
@@ -140,10 +143,12 @@ namespace tinychat{
                 {
                     // buf[n-1]=0;buf[n-2]=0;
                     conn->inbuf_ += buf;
-                    // log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, connect->inbuf_.size());
+                     log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, conn->inbuf_.size());
                     tinychat::Chat incomingMsg;
-                    incomingMsg.ParseFromString(conn->inbuf_);
-                    handle_postmsg(conn,incomingMsg);
+                    if(incomingMsg.ParseFromString(conn->inbuf_)){
+                        conn->inbuf_.erase(0,incomingMsg.ByteSizeLong());
+                        handle_postmsg(conn,incomingMsg);
+                    }
                 }
                 else
                 {

@@ -19,7 +19,6 @@
 #include <grpcpp/server_context.h>
 #include <grpcpp/impl/service_type.h>
 #include <grpcpp/support/sync_stream.h>
-#include "server/epoll_server.hpp"
 namespace tinychat {
 
 static const char* EpollServices_method_names[] = {
@@ -31,6 +30,7 @@ static const char* EpollServices_method_names[] = {
   "/tinychat.EpollServices/JoinGroup",
   "/tinychat.EpollServices/QueryHistory",
 };
+
 std::unique_ptr< EpollServices::Stub> EpollServices::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
   (void)options;
   std::unique_ptr< EpollServices::Stub> stub(new EpollServices::Stub(channel, options));
@@ -285,38 +285,38 @@ EpollServices::Service::~Service() {
 }
 
 ::grpc::Status EpollServices::Service::Login(::grpc::ServerContext* context, const ::tinychat::LoginArg* request, ::tinychat::LoginReply* response) {
-    (void) context;
-    (void) request;
-    (void) response;
-    return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
 ::grpc::Status EpollServices::Service::SignUp(::grpc::ServerContext* context, const ::tinychat::SignUpArg* request, ::tinychat::SignUpReply* response) {
-    (void) context;
-    (void) request;
-    (void) response;
-    return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
 ::grpc::Status EpollServices::Service::CreateGroup(::grpc::ServerContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::CreateGroupReply* response) {
-    (void) context;
-    (void) request;
-    (void) response;
-    return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
 ::grpc::Status EpollServices::Service::QueryUsername(::grpc::ServerContext* context, const ::tinychat::QueryUsernameArg* request, ::tinychat::QueryUsernameReply* response) {
-    (void) context;
-    (void) request;
-    (void) response;
-    return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
 ::grpc::Status EpollServices::Service::ChangeGroup(::grpc::ServerContext* context, const ::tinychat::ChangeGroupArg* request, ::tinychat::ChangeGroupReply* response) {
-    (void) context;
-    (void) request;
-    (void) response;
-    return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
 ::grpc::Status EpollServices::Service::JoinGroup(::grpc::ServerContext* context, const ::tinychat::JoinGroupArg* request, ::tinychat::JoinGroupReply* response) {

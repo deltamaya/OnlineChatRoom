@@ -39,12 +39,13 @@ namespace tinychat{
     
     std::future<int> receiver(std::unique_ptr<Connection> &conn);
     void post_msg(std::unique_ptr<Connection> &conn,std::string);
-
+    int changeGroup(int gid);
     constexpr uint16_t port = 55369;
-    inline std::string userid, username, group = "null", gid = "null";
+    inline std::string group, username;
     constexpr std::string serveraddr = "127.0.0.1";
     inline ThreadPool<5> workers;
     inline std::unordered_map<int, std::string> uid_to_name;
+    inline int cfd=-1,gid=-1,uid=-1;
     
 }
 #endif //ONLINE_CHATROOM_CLIENT_H

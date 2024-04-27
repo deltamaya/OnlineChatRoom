@@ -3,7 +3,8 @@
 namespace tinychat{
     extern EpollServer server;
     class EpollServicesImpl final:public EpollServices::Service{
-        ::grpc::Status Login(::grpc::ServerContext* context, const ::tinychat::LoginArg* request, ::tinychat::LoginReply* response) {
+        ::grpc::Status Login(::grpc::ServerContext* context, const ::tinychat::LoginArg* request,
+                             ::tinychat::LoginReply* response) override{
             auto dbconn=server.get();
             std::string query_string =std::format("select * from Users where id={} and pwd=password('{}');",request->uid(),
                                                   request->password());
@@ -15,12 +16,12 @@ namespace tinychat{
             if (result.num_rows() > 0)
             {
                 response->set_ok(true);
-                return {grpc::StatusCode::OK,""};
+                return grpc::Status::OK;
             }
-            return ::grpc::Status(::grpc::StatusCode::NOT_FOUND, "");
+            return grpc::Status::CANCELLED;
         }
         
-        ::grpc::Status SignUp(::grpc::ServerContext* context, const ::tinychat::SignUpArg* request, ::tinychat::SignUpReply* response) {
+        ::grpc::Status SignUp(::grpc::ServerContext* context, const ::tinychat::SignUpArg* request, ::tinychat::SignUpReply* response) override{
             auto dbconn=server.get();
             std::string query_string = format("insert into Users(name,pwd) value('{}',password('{}'))", request->username(),
                                               request->password());
@@ -37,7 +38,7 @@ namespace tinychat{
             return ::grpc::Status(::grpc::StatusCode::NOT_FOUND, "");
         }
         
-        ::grpc::Status CreateGroup(::grpc::ServerContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::CreateGroupReply* response) {
+        ::grpc::Status CreateGroup(::grpc::ServerContext* context, const ::tinychat::CreateGroupArg* request, ::tinychat::CreateGroupReply* response)override {
             auto dbconn = server.get();
             if(!request->has_uid()){
                 return ::grpc::Status(::grpc::StatusCode::UNAVAILABLE, "");;
@@ -60,7 +61,8 @@ namespace tinychat{
             return ::grpc::Status(::grpc::StatusCode::NOT_FOUND, "");
         }
         
-        ::grpc::Status QueryUsername(::grpc::ServerContext* context, const ::tinychat::QueryUsernameArg* request, ::tinychat::QueryUsernameReply* response) {
+        ::grpc::Status QueryUsername(::grpc::ServerContext* context, const ::tinychat::QueryUsernameArg* request,
+                                     ::tinychat::QueryUsernameReply* response) override{
             auto dbconn = server.get();
             if(!request->has_uid()){
                 return ::grpc::Status(::grpc::StatusCode::CANCELLED, "");;
@@ -79,15 +81,13 @@ namespace tinychat{
             return ::grpc::Status(::grpc::StatusCode::NOT_FOUND, "");
         }
         
-        ::grpc::Status ChangeGroup(::grpc::ServerContext* context, const ::tinychat::ChangeGroupArg* request, ::tinychat::ChangeGroupReply* response) {
+        ::grpc::Status ChangeGroup(::grpc::ServerContext* context, const ::tinychat::ChangeGroupArg* request, ::tinychat::ChangeGroupReply* response) override{
             auto dbconn =server.get();
-            Response ret;
-            std::string query_string = std::format("select name from Groups where id={};", request->uid());
+            std::string query_string = std::format("select name from Groups where id={};", request->gid());
             log_debug("{}", query_string);
             auto insert = dbconn->query(query_string);
             insert.disable_exceptions();
             auto result = insert.store();
-            ret.service_=ServiceCode::cd;
             if (result.num_rows() > 0)
             {
                 std::string exist_query_string = std::format("select * from UserGroup where uid={} and gid={};", request->uid(),
@@ -110,35 +110,34 @@ namespace tinychat{
                     log_debug("no user in the group");
                 }
             }
-            else
-            {
-            }
-            log_debug("{}", ret.serialize());
+            response->set_ok(true);
             server.ret(dbconn);
             return ::grpc::Status(::grpc::StatusCode::OK, "");
         }
         
-        ::grpc::Status JoinGroup(::grpc::ServerContext* context, const ::tinychat::JoinGroupArg* request, ::tinychat::JoinGroupReply* response) {
+        ::grpc::Status JoinGroup(::grpc::ServerContext* context, const ::tinychat::JoinGroupArg* request, ::tinychat::JoinGroupReply* response) override{
             (void) context;
             (void) request;
             (void) response;
             return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
         }
         
-        ::grpc::Status QueryHistory(::grpc::ServerContext* context, const ::tinychat::QueryHistoryArg* request, ::tinychat::QueryHistoryReply* response) {
+        ::grpc::Status QueryHistory(::grpc::ServerContext* context, const ::tinychat::QueryHistoryArg* request, ::tinychat::QueryHistoryReply* response)override {
             (void) context;
             (void) request;
             (void) response;
             return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
         }
     };
-    std::unique_ptr<grpc::Server> RunRpcServer() {
-        std::string server_address("0.0.0.0:50051");
+    void RunRpcServer(std::string server_address) {
         EpollServicesImpl service;
         grpc::ServerBuilder builder;
         builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
         builder.RegisterService(&service);
         std::unique_ptr<grpc::Server> rpcServer(builder.BuildAndStart());
-        return rpcServer;
+        minilog::log_info("Server listening on {}" , server_address);
+        
+        rpcServer->Wait();
+
     }
 }

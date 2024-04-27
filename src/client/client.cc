@@ -7,7 +7,7 @@ namespace tinychat{
     void sender(std::unique_ptr<Connection> &conn) {
         while (!conn->outbuf_.empty()) {
             auto n = ::send(conn->client_->fd(), conn->outbuf_.c_str(), conn->outbuf_.size(), 0);
-            log_debug("sendding n={}", n);
+            log_debug("sendding n={}, buf size: {}", n,conn->outbuf_.size());
             if (n > 0) {
                 conn->outbuf_.erase(0, n);
             } else {
@@ -37,8 +37,10 @@ namespace tinychat{
                 conn->inbuf_ += buf;
                 // log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, connect->inbuf_.size());
                 Chat resp;
-                resp.ParseFromString(conn->inbuf_);
-                workers.submit(handle_msg, ref(conn), resp);
+                if(resp.ParseFromString(conn->inbuf_)){
+                    conn->inbuf_.erase(0,resp.ByteSizeLong());
+                    workers.submit(handle_msg, ref(conn), resp);
+                }
                 
                 
             }
@@ -58,39 +60,59 @@ namespace tinychat{
 
 
 using namespace tinychat;
-int cfd=-1;
+
 
 
 int main() {
     
     auto local = std::make_unique<tinychat::Sock>(socket(AF_INET, SOCK_STREAM, 0));
     int opt = 1;
+    minilog::log_debug("socket create ok");
+    
     setsockopt(local->fd(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-    // Sock local(socket(AF_INET,SOCK_STREAM,0));
+//     Sock local(socket(AF_INET,SOCK_STREAM,0));
     local->bind();
+    minilog::log_debug("bind ok");
+    
     local->connect(serveraddr, port);
+    minilog::log_debug("connect ok");
+    
     auto conn = std::make_unique<Connection>(std::move(local), nullptr);
+    minilog::log_debug("connection create ok");
+    
     char buf[bufsize];
-    auto n = recv(conn->client_->fd(), buf, sizeof(buf) - 1, 0);
-    cfd=std::stoi(buf);
-    minilog::log_debug("my fd is {}",cfd);
+    while(cfd==-1){
+        auto n = recv(conn->client_->fd(), buf, sizeof(buf) - 1, 0);
+        minilog::log_debug("read bytes count; {}",n);
+        if(n>0) {
+            auto str = std::string(buf);
+            minilog::log_debug("str: {}", str);
+            
+            cfd = std::stoi(str);
+            minilog::log_debug("my fd is {}", cfd);
+            break;
+        }
+
+        sleep(1);
+    }
+
     int choice;
 again:
     std::cout << "input 1 for signup, 2 to login, 0 for exit:> ";
     std::cin >> choice;
-    int notok;
+    int ok;
     switch (choice) {
         case 1:
-            notok = signup(conn);
+            ok = signup(conn);
             break;
         case 2:
-            notok = login(conn);
+            ok = login(conn);
             break;
         default:
             workers.shutdown();
             exit(0);
     }
-    if (notok)
+    if (!ok)
         goto again;
     std::cout << "=====CHATNOW=====\n";
     std::promise<void> pro;
@@ -106,7 +128,7 @@ again:
     Request r;
     std::cout << "input help to get useful info\n";
     while (getline(std::cin, msg)) {
-        r.uid_ = userid;
+        r.uid_ = std::to_string(uid);
         r.service_ = ServiceCode::postmsg;
         r.to_whom_ = gid;
         if (msg.find("#") != std::string::npos) {
@@ -117,7 +139,7 @@ again:
         std::string command;
         std::string body;
         smsg >> command;
-        smsg >> body;
+        
         if (!strcasecmp(command.c_str(), "quit")) {
             break;
         } else if (!strcasecmp(command.c_str(), "show")) {
@@ -127,8 +149,10 @@ again:
             std::cout << std::format(
                     "----------\nsend [your message]\t--to send message to other people\nhistory [line count]\t--to get chat history(less than 100)\nshow\t\t\t--to show your contacts\ncd [group number]\t--change your destination that your message was post\nquit\t\t\t--to quit the program\n----------\n");
         } else if (!strcasecmp(command.c_str(), "send")) {
+            body=smsg.str().substr(int(smsg.tellg())+1);
             minilog::log_info("sending msg: {}", body);
             post_msg(conn, std::move(body));
+            sender(conn);
         } else if (!strcasecmp(command.c_str(), "creategroup")) {
             std::string group_name;
             smsg >> group_name;
@@ -141,7 +165,7 @@ again:
             conn->outbuf_ = r.serialize();
             sender(conn);
         } else if (!strcasecmp(command.c_str(), "history")) {
-            if (gid == "null") {
+            if (gid == -1) {
                 std::cout << "you need use 'cd' to focus on a group\n";
                 continue;
             }
@@ -171,10 +195,9 @@ again:
             sender(conn);
         } else if (!strcasecmp(command.c_str(), "cd")) {
             smsg >> body;
-            r.service_ = ServiceCode::cd;
-            r.msg_ = body;
-            conn->outbuf_ = r.serialize();
-            sender(conn);
+            minilog::log_debug("body: {}",body);
+            int newGid=std::stoi(body);
+            changeGroup(newGid);
         } else {
             std::cout << "usage error, type 'help' to get more useful info\n";
         }

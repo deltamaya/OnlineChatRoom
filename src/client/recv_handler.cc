@@ -14,29 +14,7 @@ namespace tinychat{
         return 0;
     }
     
-    int handle_login(const Response &res) {
-        if (res.status_ == StatusCode::error) {
-            std::cout << "wrong password or userid\n";
-        } else if (res.status_ == StatusCode::ok) {
-            username = res.msg_;
-            // log_debug("username: {} userid: {}", username, userid);
-            
-            uid_to_name[stoi(userid)] = username;
-            std::cout << std::format("welcome back, {}\n", username);
-        }
-        return res.status_ == StatusCode::ok ? 0 : 1;
-    }
-    
-    int handle_signup(const Response &res) {
-        if (res.status_ == StatusCode::error) {
-            std::cout << "can not sign up for now\n";
-        } else if (res.status_ == StatusCode::ok) {
-            std::cout << std::format("hello, {},your id is {},please remember.\n", username, res.uid_);
-            userid = res.uid_;
-        }
-        return res.status_ == StatusCode::ok ? 0 : 1;
-    }
-    
+
     void handle_query_history(std::unique_ptr<Connection> &conn, const Response &res) {
         // log_debug("ok");
         int count = 0, pos = 0, prev = 0;
