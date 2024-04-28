@@ -143,7 +143,7 @@ namespace tinychat{
                 {
                     // buf[n-1]=0;buf[n-2]=0;
                     conn->inbuf_ += buf;
-                     log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, conn->inbuf_.size());
+//                     log_debug("now inbuf is : |{}|,length:{}", conn->inbuf_, conn->inbuf_.size());
                     tinychat::Chat incomingMsg;
                     if(incomingMsg.ParseFromString(conn->inbuf_)){
                         conn->inbuf_.erase(0,incomingMsg.ByteSizeLong());
